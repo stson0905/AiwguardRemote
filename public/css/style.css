@@ -1,0 +1,1106 @@
+/* =====================================================================
+   화면 테마
+   ---------------------------------------------------------------------
+   모든 색/반경/효과는 아래 CSS 변수로만 정해진다. :root 값이 기본 테마
+   "클래식 다크"이고, html[data-theme="ocean"] 블록이 "딥 오션" 테마로
+   덮어쓴다. 테마 전환은 js/theme.js가 <html data-theme>만 바꾸는 것으로
+   끝난다 — 새 색을 쓸 일이 있으면 아래 규칙에 직접 색을 적지 말고 변수를
+   하나 추가하고 두 테마 블록에 값을 넣을 것.
+   ===================================================================== */
+:root {
+  /* 기본 팔레트 */
+  --bg: #0d1117;
+  --bg-grid: #05070a;
+  --panel: #161b22;
+  --panel-2: #1c2330;
+  --border: #2a3342;
+  --text: #d8e0ea;
+  --text-dim: #8a97a8;
+  --accent: #2f8fdb;
+  --accent-2: #58a6ff;
+  --on-accent: #fff;
+  --ok: #3fb950;
+  --warn: #ffb020;
+  --danger: #ff4d4f;
+  --roi-fill: rgba(58, 160, 255, 0.16);
+  --roi-stroke: #3aa0ff;
+  --bbox-stroke: #ffcc33;
+
+  /* 구성 요소별 */
+  --btn-bg: var(--panel-2);
+  --btn-hover: #26314a;
+  --accent-btn-bg: var(--accent);
+  --accent-btn-border: var(--accent);
+  /* 그림자 목록의 한 항목으로도 쓰이므로(`0 0 0 1px ..., var(--accent-btn-shadow)`) none이 아니라 투명 그림자로 둔다 — none이 섞이면 선언 전체가 무효가 된다 */
+  --accent-btn-shadow: 0 0 0 0 transparent;
+  --input-bg: #0f141c;
+  --focus-ring: 0 0 0 2px rgba(88, 166, 255, .25);
+  --armed-bg: #1c3350;
+  --armed-hover: #2a4870;
+  --dot-off: #555;
+  --titlebar-bg: linear-gradient(180deg, #1d2532, #171d28);
+  --tile-bg: var(--panel);
+  --tile-border: var(--border);
+  --tile-hover-border: var(--border);
+  --chips-bg: #10151d;
+  --float-bg: rgba(10, 14, 20, .92);
+  --badge-bg: rgba(0, 0, 0, .55);
+  --backdrop: rgba(0, 0, 0, .6);
+  --backdrop-zoom: rgba(3, 6, 10, .78);
+  --backdrop-unlock: rgba(5, 7, 10, .85);
+  --toast-bg: #2a1113;
+  --toast-title: #ff8a8a;
+  --toast-shadow: 0 4px 16px rgba(0, 0, 0, .5);
+  --warn-box-bg: #3a2a15;
+  --warn-box-text: #ffcf8b;
+  --danger-btn-bg: #3a1519;
+  --danger-btn-text: #ff9a9a;
+  --recv-box-bg: rgba(255, 255, 255, .02);
+  --row-selected-bg: rgba(58, 160, 255, .12);
+  --radius: 4px;
+  --radius-lg: 8px;
+  --shadow-lg: 0 14px 44px rgba(0, 0, 0, .65);
+  --alarm-glow: 0 0 0 0 transparent; /* 같은 이유로 none 대신 투명 그림자 */
+  --glass: none; /* backdrop-filter — 클래식 테마는 불투명 패널이라 쓰지 않는다 */
+}
+
+/* ---------- 딥 오션 테마 ----------
+   침수 감시 시스템이라는 용도에 맞춰 "물속에서 올려다본 바다"를 모티브로 했다.
+   짙은 남청색 바탕 위로 옅은 빛과 잔잔한 물결(동심원) 무늬가 깔리고, 상단바/사이드바/설정 창은
+   뒤가 비치는 반투명 유리 패널로 떠 있다. 강조색은 아쿠아(물빛), 경보는 물빛과 가장 대비되는 산호색.
+   영상 타일에는 흐림(backdrop-filter)을 쓰지 않는다 — 36분할에서 영상 36개 위에 흐림을 얹으면 GPU 부담이 크다. */
+html[data-theme="ocean"] {
+  --bg: #04131f;
+  --bg-grid: transparent; /* 타일 사이 틈으로 body의 바다 배경이 비친다 */
+  --panel: rgba(7, 34, 52, .72);
+  --panel-2: rgba(14, 62, 88, .62);
+  --border: rgba(94, 205, 235, .22);
+  --text: #dcf5ff;
+  --text-dim: #7fb6cc;
+  --accent: #0fa8bd;
+  --accent-2: #3de3ff;
+  --on-accent: #fff;
+  --ok: #33d69f;
+  --warn: #ffc247;
+  --danger: #ff5c7a;
+
+  --btn-bg: rgba(20, 78, 108, .55);
+  --btn-hover: rgba(61, 227, 255, .18);
+  --accent-btn-bg: linear-gradient(135deg, #12b5c9, #2f6fe0);
+  --accent-btn-border: transparent;
+  --accent-btn-shadow: 0 0 0 1px rgba(61, 227, 255, .35), 0 4px 14px rgba(18, 181, 201, .35);
+  --input-bg: rgba(2, 18, 30, .75);
+  --focus-ring: 0 0 0 3px rgba(61, 227, 255, .2);
+  --armed-bg: rgba(15, 168, 189, .28);
+  --armed-hover: rgba(15, 168, 189, .45);
+  --dot-off: #3b5f70;
+  --titlebar-bg: linear-gradient(180deg, rgba(18, 84, 116, .92), rgba(8, 48, 70, .92));
+  --tile-bg: rgba(5, 28, 44, .8);
+  --tile-border: rgba(94, 205, 235, .18);
+  --tile-hover-border: rgba(61, 227, 255, .45);
+  --chips-bg: rgba(4, 28, 44, .85);
+  --float-bg: rgba(4, 26, 42, .9);
+  --badge-bg: rgba(2, 20, 32, .7);
+  --backdrop: rgba(2, 14, 24, .55);
+  --backdrop-zoom: rgba(2, 14, 24, .72);
+  --backdrop-unlock: rgba(2, 14, 24, .85);
+  --toast-bg: rgba(64, 14, 36, .92);
+  --toast-title: #ff9db0;
+  --toast-shadow: 0 8px 28px rgba(255, 92, 122, .25), 0 4px 16px rgba(0, 0, 0, .4);
+  --warn-box-bg: rgba(90, 60, 10, .6);
+  --warn-box-text: #ffd98a;
+  --danger-btn-bg: rgba(90, 20, 40, .7);
+  --danger-btn-text: #ffa3b5;
+  --recv-box-bg: rgba(61, 227, 255, .04);
+  --row-selected-bg: rgba(61, 227, 255, .14);
+  --radius: 8px;
+  --radius-lg: 14px;
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, .55), 0 0 0 1px rgba(61, 227, 255, .12);
+  --alarm-glow: 0 0 22px rgba(255, 92, 122, .55);
+  --glass: blur(14px) saturate(150%);
+}
+
+/* ---------- 하이드로 차트 테마 (v0.5.0, 데이라이트 대체) ----------
+   "수문 측량 도면"이 모티브. 따뜻한 종이색 바탕에 옅은 등고선과 모눈, 남색 제도 잉크 글자, 얇은 잉크 선 테두리,
+   모서리가 거의 각진 카드. 경보색은 측량 도면의 주홍(vermilion) — 남색/종이색과 가장 멀어 한눈에 튄다.
+   이 테마만의 요소: 맨 위 "감시 상태 띠"(.watch-status — 평소 남색, 경보 시 주홍 줄무늬), 타일 번호표(01, 02…),
+   영상 왼쪽 가장자리의 수위 눈금자, 경보 타일의 주홍 제목줄. 색 변수는 여기, 배치 규칙은 파일 맨 아래 "하이드로 차트 배치" 절에 있다.
+   글꼴: 숫자/영문은 Windows 기본 Bahnschrift(DIN 계열 — 도면/계기 느낌), 한글은 맑은 고딕. 폐쇄망이라 웹 폰트는 쓰지 않는다. */
+html[data-theme="hydro"] {
+  --ink: #14263d;          /* 제도 잉크(남색) — 선/글자/띠에 공통 */
+  --paper: #faf8f3;
+  --bg: #efebe2;
+  --bg-grid: transparent;  /* 타일 사이 틈으로 body의 등고선/모눈이 비친다 */
+  --panel: #faf8f3;
+  --panel-2: #f2eee5;
+  --border: #cbc3b2;
+  --text: #14263d;
+  --text-dim: #5d6b7c;
+  --accent: #1b5a8c;
+  --accent-2: #0a7ea4;
+  --on-accent: #fff;
+  --ok: #1f8a55;
+  --warn: #c27a00;
+  --danger: #d6401a;
+
+  --btn-bg: #faf8f3;
+  --btn-hover: #e5edf1;
+  --accent-btn-bg: #14263d;
+  --accent-btn-border: #14263d;
+  --accent-btn-shadow: 0 0 0 0 transparent;
+  --input-bg: #fffefb;
+  --focus-ring: 0 0 0 3px rgba(10, 126, 164, .22);
+  --armed-bg: #dde9ef;
+  --armed-hover: #cde0e9;
+  --dot-off: #b5ae9f;
+  --titlebar-bg: #faf8f3;
+  --tile-bg: #faf8f3;
+  --tile-border: rgba(20, 38, 61, .55);
+  --tile-hover-border: #0a7ea4;
+  --chips-bg: #f2eee5;
+  --float-bg: rgba(250, 248, 243, .97);
+  --badge-bg: rgba(20, 38, 61, .82);
+  --backdrop: rgba(20, 38, 61, .42);
+  --backdrop-zoom: rgba(20, 38, 61, .55);
+  --backdrop-unlock: rgba(239, 235, 226, .95);
+  --toast-bg: #fffdf8;
+  --toast-title: #c2360f;
+  --toast-shadow: 0 12px 32px rgba(20, 38, 61, .26);
+  --warn-box-bg: #fbefd6;
+  --warn-box-text: #7a4a00;
+  --danger-btn-bg: #fbe6df;
+  --danger-btn-text: #a52c0c;
+  --recv-box-bg: #f6f3ec;
+  --row-selected-bg: #e0ecf2;
+  --radius: 3px;
+  --radius-lg: 5px;
+  --shadow-lg: 0 18px 50px rgba(20, 38, 61, .3);
+  --alarm-glow: 0 0 0 4px rgba(214, 64, 26, .25);
+  --glass: none;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Malgun Gothic", "Segoe UI", -apple-system, sans-serif;
+  font-size: 13px;
+  overflow: hidden;
+}
+/* 딥 오션 배경: 위쪽 왼편에서 비쳐 드는 빛, 아래 오른편의 깊은 물빛, 그 위에 아주 옅은 동심원 물결 두 겹.
+   전부 정적 그라디언트라 그리기 비용이 거의 없다(애니메이션은 감시 화면에서 시선을 빼앗으므로 일부러 넣지 않았다). */
+html[data-theme="ocean"] body {
+  background:
+    radial-gradient(1100px 620px at 12% -12%, rgba(61, 227, 255, .20), transparent 62%),
+    radial-gradient(900px 560px at 92% 108%, rgba(15, 168, 189, .24), transparent 60%),
+    repeating-radial-gradient(circle at 30% 18%, rgba(255, 255, 255, .045) 0 1.5px, transparent 1.5px 78px),
+    repeating-radial-gradient(circle at 74% 70%, rgba(255, 255, 255, .034) 0 1.5px, transparent 1.5px 96px),
+    linear-gradient(180deg, #072538 0%, #04131f 55%, #020b13 100%);
+}
+button {
+  cursor: pointer;
+  background: var(--btn-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 5px 10px;
+  font-size: 12px;
+}
+button:hover { background: var(--btn-hover); }
+input, select { background: var(--input-bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 6px; }
+input:focus, select:focus { outline: none; border-color: var(--accent-2); box-shadow: var(--focus-ring); }
+/* ---------- 감시 상태 띠 (index.html #watchStatus, app.js renderWatchStatus) ----------
+   모든 테마 공통. 화면 맨 위 얇은 띠에 전체 정상/경보 상태 + 채널·화면·경보 수 + 시계.
+   경보가 나면 띠 전체가 사선 줄무늬(위험 표지)로 바뀌고 "경보 화면 보기" 버튼이 나온다.
+   아래 기본값은 클래식 다크 모양이고, 딥 오션/하이드로 차트는 각자 절에서 색만(하이드로는 높이도) 덮어쓴다.
+   주의: .ws-clock 등에 color를 직접 주지 말 것 — 띠의 글자색을 물려받아야 테마마다 띠 색만 바꾸면 된다. */
+.watch-status {
+  display: flex; align-items: center; gap: 14px; height: 26px; padding: 0 12px; flex-shrink: 0;
+  background: #080b10; color: var(--text); border-bottom: 1px solid var(--border);
+  font-size: 11.5px; white-space: nowrap; overflow: hidden;
+}
+.ws-state { display: flex; align-items: center; gap: 7px; font-weight: 700; letter-spacing: 1px; color: var(--ok); }
+.ws-lamp { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+.ws-spacer { flex: 1; }
+.ws-metrics { display: flex; gap: 14px; color: var(--text-dim); }
+.ws-metrics b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.ws-metrics small { opacity: .75; }
+.ws-clock { font-variant-numeric: tabular-nums; letter-spacing: .5px; padding-left: 14px; border-left: 1px solid var(--border); }
+.ws-detail { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ws-goto { height: 20px; padding: 0 10px; font-size: 11px; font-weight: 700; flex-shrink: 0; background: #fff; color: #c62828; border: none; border-radius: var(--radius); }
+.ws-goto:hover { background: #ffe5e5; }
+.watch-status.alarm {
+  background: repeating-linear-gradient(-45deg, #c62828 0 14px, #a51f1f 14px 28px);
+  color: #fff; border-bottom-color: var(--danger);
+}
+.watch-status.alarm .ws-state { color: #fff; }
+.watch-status.alarm .ws-lamp { background: #fff; box-shadow: 0 0 8px #fff; animation: pg-blink 1s infinite; }
+.watch-status.alarm .ws-metrics { color: rgba(255, 255, 255, .8); }
+.watch-status.alarm .ws-metrics b { color: #fff; }
+.watch-status.alarm .ws-clock { border-left-color: rgba(255, 255, 255, .35); }
+/* 딥 오션: 수면 아래 비치는 반투명 유리 띠 + 아쿠아 빛 글자, 경보는 산호색 줄무늬와 번지는 빛 */
+html[data-theme="ocean"] .watch-status {
+  position: relative; z-index: 3;
+  background: linear-gradient(90deg, rgba(2, 18, 30, .88), rgba(6, 42, 62, .82) 50%, rgba(2, 18, 30, .88));
+  border-bottom-color: rgba(61, 227, 255, .2);
+  backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass);
+}
+html[data-theme="ocean"] .ws-state { color: var(--accent-2); text-shadow: 0 0 10px rgba(61, 227, 255, .45); }
+html[data-theme="ocean"] .ws-lamp { background: var(--ok); box-shadow: 0 0 10px rgba(51, 214, 159, .85); }
+html[data-theme="ocean"] .ws-clock { border-left-color: rgba(61, 227, 255, .2); }
+html[data-theme="ocean"] .ws-goto { border-radius: 999px; color: #c2304f; }
+html[data-theme="ocean"] .watch-status.alarm {
+  background: repeating-linear-gradient(-45deg, rgba(255, 92, 122, .95) 0 14px, rgba(212, 56, 92, .95) 14px 28px);
+  border-bottom-color: rgba(255, 157, 176, .6); box-shadow: 0 0 18px rgba(255, 92, 122, .5);
+}
+html[data-theme="ocean"] .watch-status.alarm .ws-state { color: #fff; text-shadow: none; }
+/* 버튼 안의 아이콘 칸(<i>)은 기울임이 아니다. .xl-only는 "아이콘+이름" 버튼을 쓰는 테마(하이드로 차트)에서만 보이는 요소
+   (분할 버튼의 격자 아이콘과 "분할" 글자, 전체화면 버튼의 이름). 다른 테마에서는 숫자/아이콘만 보이는 기존 모습을 유지한다. */
+.ico, .lg-ico { font-style: normal; }
+.xl-only { display: none; }
+/* 딥 오션 테마의 스크롤바 — 유리 패널 위에 기본 회색 스크롤바가 얹히면 튄다 */
+html[data-theme="ocean"] ::-webkit-scrollbar { width: 10px; height: 10px; }
+html[data-theme="ocean"] ::-webkit-scrollbar-track { background: transparent; }
+html[data-theme="ocean"] ::-webkit-scrollbar-thumb { background: rgba(61, 227, 255, .25); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+html[data-theme="ocean"] ::-webkit-scrollbar-thumb:hover { background: rgba(61, 227, 255, .45); border: 2px solid transparent; background-clip: padding-box; }
+
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+/* ---------- Topbar ---------- */
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 46px;
+  padding: 0 12px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+}
+/* 딥 오션: 상단바 아래 가장자리에 수면처럼 빛나는 선(가운데가 밝고 양끝으로 사라진다) */
+html[data-theme="ocean"] #topbar {
+  border-bottom-color: transparent;
+  background: linear-gradient(180deg, rgba(9, 44, 66, .85), rgba(6, 30, 48, .8));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  backdrop-filter: var(--glass);
+  -webkit-backdrop-filter: var(--glass);
+  z-index: 2;
+}
+html[data-theme="ocean"] #topbar::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(61, 227, 255, .9) 25%, rgba(61, 227, 255, .9) 75%, transparent);
+}
+.brand { font-weight: 700; letter-spacing: .5px; white-space: nowrap; }
+.brand span { color: var(--accent-2); }
+html[data-theme="ocean"] .brand span { text-shadow: 0 0 14px rgba(61, 227, 255, .55); }
+.layout-switch, .page-tabs, .toolbar-actions { display: flex; gap: 4px; }
+/* 숨긴 분할 버튼(36) — 테마별 button display 규칙이 hidden 속성을 이기지 않게 */
+.layout-switch button[hidden] { display: none !important; }
+.layout-switch button.active, .page-tabs button.active {
+  background: var(--accent-btn-bg); border-color: var(--accent-btn-border); color: var(--on-accent); box-shadow: var(--accent-btn-shadow);
+}
+.page-tabs button { min-width: 24px; }
+/* 딥 오션: 분할/페이지 버튼 묶음을 알약 모양 세그먼트 컨트롤로 */
+html[data-theme="ocean"] .layout-switch, html[data-theme="ocean"] .page-tabs {
+  background: rgba(2, 18, 30, .55); border: 1px solid var(--border); border-radius: 999px; padding: 3px; gap: 2px;
+}
+html[data-theme="ocean"] .layout-switch button, html[data-theme="ocean"] .page-tabs button {
+  background: transparent; border-color: transparent; border-radius: 999px; padding: 3px 10px;
+}
+html[data-theme="ocean"] .layout-switch button:hover, html[data-theme="ocean"] .page-tabs button:hover { background: var(--btn-hover); }
+html[data-theme="ocean"] .layout-switch button.active, html[data-theme="ocean"] .page-tabs button.active { background: var(--accent-btn-bg); }
+html[data-theme="ocean"] .toolbar-actions button { border-radius: 999px; }
+.topbar-spacer { flex: 1; }
+.status-lights { display: flex; gap: 10px; font-size: 11px; color: var(--text-dim); }
+.status-lights .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; background: var(--dot-off); }
+.status-lights .dot.connected { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+.status-lights .dot.connecting { background: var(--warn); }
+.status-lights .dot.error, .status-lights .dot.disconnected { background: var(--danger); }
+/* 수신 대기(server) 모드: 포트는 열려 있으나 아직 접속한 소스가 없는 상태 */
+.status-lights .dot.listening { background: var(--accent-2); }
+.tb-btn.small { padding: 3px 7px; font-size: 11px; }
+
+/* ---------- Body layout ---------- */
+#body { flex: 1; display: flex; min-height: 0; }
+
+#sidebar {
+  width: 220px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 6px;
+  flex-shrink: 0;
+  backdrop-filter: var(--glass);
+  -webkit-backdrop-filter: var(--glass);
+}
+#channelSearch { width: 100%; }
+.sidebar-hint { font-size: 11px; color: var(--text-dim); line-height: 1.4; }
+#channelList { list-style: none; margin: 0; padding: 0; flex: 1; overflow-y: auto; }
+#channelList li {
+  padding: 6px 8px; margin-bottom: 3px; border-radius: var(--radius); background: var(--panel-2);
+  border: 1px solid transparent; cursor: grab; font-size: 12px; display: flex; justify-content: space-between; align-items: center;
+}
+#channelList li:hover { border-color: var(--border); }
+#channelList li.armed { border-color: var(--accent); background: var(--armed-bg); }
+html[data-theme="ocean"] #channelList li.armed { box-shadow: inset 3px 0 0 var(--accent-2); }
+#channelList li .ch-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--dot-off); }
+#channelList li .ch-dot.on { background: var(--ok); }
+/* 사용자분할: 고른 채널은 강조하고 오른쪽에 고른 순서 번호를 보여준다 */
+#channelList li.picked { border-color: var(--accent); background: var(--armed-bg); }
+#channelList li .pick-no {
+  min-width: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: #fff;
+  font-size: 10px; font-weight: 700; text-align: center; line-height: 16px;
+}
+.side-add-btn { width: 100%; }
+
+/* position: relative — 확대 보기 오버레이(.zoom-overlay)가 이 영역(사이드바/툴바를 뺀 메인 화면) 기준으로 가운데 잡힌다 */
+#gridWrap { flex: 1; overflow: auto; background: var(--bg-grid); padding: 4px; min-width: 0; position: relative; }
+.grid { display: grid; gap: 4px; width: 100%; height: 100%; }
+.grid-1 { grid-template-columns: repeat(1, 1fr); grid-template-rows: repeat(1, 1fr); }
+.grid-4 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
+/* 8분할: 4x4 격자에서 첫 칸(0번, 선택된 채널)이 왼쪽 위 3x3을 차지하고, 나머지 7칸은 자동 배치로
+   오른쪽 열 3칸 + 아래 줄 4칸에 같은 크기로 들어간다. 큰 화면·작은 화면 모두 화면 전체와 같은 비율이라 영상이 덜 찌그러진다.
+   :first-child 기준이라 크게보기로 타일 DOM 순서를 바꾸거나 확대 보기 자리표시자가 끼어도 모양이 유지된다. */
+.grid-8 { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); }
+.grid-8 > .tile:first-child { grid-column: 1 / span 3; grid-row: 1 / span 3; }
+.grid-16 { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); }
+.grid-36 { grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(6, 1fr); }
+.grid.solo-active .tile { display: none; }
+.grid.solo-active .tile.is-solo { display: flex; grid-column: 1 / -1; grid-row: 1 / -1; }
+
+/* 36분할(grid-dense, grid.js가 붙임)은 타일 폭이 16분할의 3분의 2 정도라 제목줄 버튼 5개가 채널명을 가린다.
+   감시 중에는 쓰지 않는 ROI 관리 버튼(＋ROI/ROI수정/ROI삭제)은 타일에 마우스를 올렸을 때만 보이게 하고 글자를 줄인다.
+   ⛶로 한 타일만 크게 볼 때(solo-active)와 더블클릭 확대 보기(타일이 그리드 밖 .zoom-box로 옮겨짐)에서는 원래 크기로 보인다.
+   (:is()로 묶지 않은 것은 폐쇄망 PC의 구형 브라우저에서 규칙 전체가 무시되지 않게 하려는 것) */
+.grid-dense { gap: 3px; }
+.grid-dense:not(.solo-active) .tile-titlebar { padding: 2px 4px; font-size: 10px; gap: 3px; }
+.grid-dense:not(.solo-active) .tile-actions button { padding: 0 4px; font-size: 9px; }
+.grid-dense:not(.solo-active) .tile:not(:hover) .act-roi,
+.grid-dense:not(.solo-active) .tile:not(:hover) .act-roi-edit,
+.grid-dense:not(.solo-active) .tile:not(:hover) .act-roi-clear,
+.grid-dense:not(.solo-active) .tile:not(:hover) .act-flow-calib { display: none; }
+.grid-dense:not(.solo-active) .roi-chip { font-size: 9px; padding: 0 4px; }
+.grid-dense:not(.solo-active) .tile-badge { font-size: 9px; padding: 1px 4px; }
+.grid-dense:not(.solo-active) .tile-empty-placeholder { font-size: 10px; padding: 4px; }
+
+.tile {
+  background: var(--tile-bg);
+  border: 1px solid var(--tile-border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  min-height: 0;
+}
+.tile:hover { border-color: var(--tile-hover-border); }
+.tile.tile-alarm { border-color: var(--danger); animation: tile-pulse 1s infinite; }
+@keyframes tile-pulse {
+  0%, 100% { box-shadow: inset 0 0 0 2px var(--danger), var(--alarm-glow); }
+  50% { box-shadow: inset 0 0 0 2px transparent; }
+}
+.tile-titlebar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--titlebar-bg);
+  padding: 3px 6px; font-size: 11px; flex-shrink: 0; gap: 4px;
+}
+.tile-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+.tile-title[contenteditable="true"] { outline: 1px dashed var(--accent); user-select: text; cursor: text; }
+/* 타일 안에서 마우스를 끌면 브라우저가 글자/영상을 여러 타일에 걸쳐 파랗게 "선택"해 버린다 — 선택 자체를 막는다. */
+/* 화면 넘김 대비 "미리 연결" 타일 보관함(grid.js warmPool). 영상이 계속 디코딩되도록 화면 안에 실제 크기로 두되
+   보이지 않게(opacity 0) 맨 뒤에 깔고 마우스도 받지 않는다. display:none이나 화면 밖 위치는 브라우저가 재생을 멈출 수 있어 쓰지 않는다. */
+#warmPool {
+  position: fixed; left: 0; bottom: 0; width: 320px; height: 200px;
+  opacity: 0; pointer-events: none; z-index: -1; overflow: hidden;
+}
+#warmPool .tile { position: absolute; inset: 0; }
+.tile { user-select: none; -webkit-user-select: none; }
+.tile input, .tile textarea, .tile select { user-select: text; -webkit-user-select: text; }
+/* 왼쪽 채널 목록에서 끄는 동안: 그 채널이 지금 있는 타일(원래 자리)은 흐리게, 놓을 타일은 테두리로 */
+.tile.drag-source { opacity: .45; }
+#channelList li.dragging { opacity: .5; }
+/* 목록 안 순서 바꾸기: 놓일 자리(항목의 위/아래)에 굵은 선 */
+#channelList li { position: relative; }
+#channelList li.drop-before::after, #channelList li.drop-after::after {
+  content: ''; position: absolute; left: 2px; right: 2px; height: 3px; border-radius: 2px; background: var(--accent); pointer-events: none;
+}
+#channelList li.drop-before::after { top: -3px; }
+#channelList li.drop-after::after { bottom: -4px; }
+/* 지금 화면에 보이는 채널 = 왼쪽 막대, 경보 중 = 빨강 (화면 밖이어도 보이게) */
+#channelList li.on-page { box-shadow: inset 3px 0 0 var(--accent); }
+#channelList li.alarming { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 22%, var(--panel-2)); }
+#channelList li.alarming .ch-dot { background: var(--danger); box-shadow: 0 0 6px var(--danger); animation: pg-blink 1s infinite; }
+#channelList li .ch-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#channelList li .pg-no { font-size: 10px; color: var(--text-dim); min-width: 16px; text-align: right; flex-shrink: 0; }
+#channelList li.on-page .pg-no { color: var(--accent); font-weight: 700; }
+/* 경보가 풀릴 때까지 남는 타일 테두리 (알람 순간의 깜빡임 .tile-alarm 과 별개) */
+.tile.tile-alarming { border-color: var(--danger); box-shadow: inset 0 0 0 2px var(--danger); }
+
+/* ---- 화면 페이지 지도 (app.js renderPageTabs) ---- */
+.page-tabs { align-items: center; gap: 4px; min-width: 0; }
+.page-map { display: flex; gap: 4px; overflow-x: auto; max-width: min(46vw, 640px); scrollbar-width: thin; padding: 2px; }
+.page-tabs .pg {
+  display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 3px 4px 1px; min-width: 0; flex-shrink: 0;
+  background: transparent; border: 1px solid transparent; border-radius: 6px; line-height: 1;
+}
+.page-tabs .pg:hover { background: var(--btn-hover); }
+.page-tabs .pg.active { border-color: var(--accent); background: var(--armed-bg); box-shadow: none; }
+.page-tabs .pg.alarm:not(.active) { border-color: var(--danger); }
+.pg-mini { display: grid; gap: 1px; width: 26px; height: 16px; }
+.pg-mini i { display: block; border-radius: 1px; background: var(--dot-off); opacity: .35; }
+.pg-mini i.c { background: var(--text-dim); opacity: .75; }
+.pg-mini i.a { background: var(--danger); opacity: 1; animation: pg-blink 1s infinite; }
+.pg.active .pg-mini i.c { background: var(--accent); opacity: 1; }
+.pg-mini-1 { grid-template-columns: 1fr; }
+.pg-mini-4 { grid-template-columns: repeat(2, 1fr); }
+.pg-mini-16, .pg-mini-8 { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); }
+.pg-mini-8 i:first-child { grid-column: 1 / 4; grid-row: 1 / 4; }
+.pg-mini-36 { grid-template-columns: repeat(6, 1fr); }
+.pg-num { font-size: 9px; color: var(--text-dim); }
+.pg.active .pg-num { color: var(--accent); font-weight: 700; }
+.pg.alarm .pg-num { color: var(--danger); font-weight: 700; }
+.pg-arrow { padding: 2px 7px; font-size: 14px; line-height: 1; }
+.pg-arrow:disabled { opacity: .3; cursor: default; }
+.pg-count { font-size: 12px; color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pg-count small { color: var(--text-dim); font-size: 10px; }
+.pg-alarm-note {
+  font-size: 11px; font-weight: 700; color: #fff; background: var(--danger); padding: 2px 8px; border-radius: 10px; white-space: nowrap;
+  animation: pg-blink 1s infinite;
+}
+@keyframes pg-blink { 50% { opacity: .35; } }
+/* 테마별 ".page-tabs button" 규칙(알약/밑줄 탭)이 더 구체적이라 페이지 지도 버튼에는 다시 덮어쓴다 */
+html[data-theme] .page-tabs .pg { padding: 3px 4px 1px; min-width: 0; border-radius: 6px; font-size: inherit; }
+html[data-theme] .page-tabs .pg.active { background: var(--armed-bg); box-shadow: none; }
+html[data-theme="hydro"] .page-tabs .pg { border: 1px solid transparent; border-radius: 2px; }
+html[data-theme="hydro"] .page-tabs .pg.active { border-color: var(--ink); background: var(--armed-bg); }
+html[data-theme="hydro"] .page-tabs .pg.alarm:not(.active) { border-color: var(--danger); }
+html[data-theme="hydro"] .pg-mini { width: 30px; height: 19px; }
+html[data-theme="hydro"] .pg.active .pg-mini i.c { background: var(--ink); }
+/* 알람 팝업: 화면 밖 채널 안내 + 이동 버튼 */
+.alarm-toast [hidden] { display: none !important; }
+.alarm-toast .at-offscreen { font-size: 12px; margin-top: 6px; padding: 6px 8px; border-radius: 4px; background: rgba(255,255,255,.06); }
+.alarm-toast .at-goto { background: var(--accent-btn-bg); border-color: var(--accent-btn-border); color: var(--on-accent); font-weight: 700; }
+.tile.drag-over { border-color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+.tile-actions { display: flex; gap: 2px; }
+.tile-actions button { padding: 1px 5px; font-size: 10px; }
+/* 수정할 ROI가 없으면 버튼을 눌러도 할 일이 없다 — 눌리지 않는다는 것이 보이게 한다 */
+.tile-actions button:disabled { opacity: .4; cursor: default; }
+.tile-video-wrap { position: relative; flex: 1; min-height: 0; background: #000; }
+/* 영상은 칸 비율에 맞춰 늘려서 칸을 꽉 채운다(검은 여백 없음 — 사용자 요청, v0.2.6). 대신 칸과 영상의 비율이 다르면
+   영상이 가로 또는 세로로 늘어나 보인다. 비율을 지키며 채우는 cover는 쓰지 않는다: 36분할에서 영상 위아래가 4분의 1가량
+   잘려 화면 가장자리(주로 아래쪽)의 수면이나 ROI가 안 보이게 되기 때문이다.
+   ROI/탐지 오버레이 좌표는 videoRect.js가 이 object-fit 값을 직접 읽어 맞추므로, 여기를 바꿔도 오버레이는 어긋나지 않는다. */
+.tile-video-wrap video { display: block; width: 100%; height: 100%; object-fit: fill; background: #000; }
+.tile-video-wrap canvas.overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.tile-video-wrap.roi-edit canvas.overlay { pointer-events: auto; cursor: crosshair; }
+.tile-empty-placeholder {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: var(--text-dim); font-size: 11px; text-align: center; padding: 10px;
+}
+/* 딥 오션: 빈 칸도 유리 패널처럼 비치게 (검은 상자가 바다 배경 위에 뚫린 구멍처럼 보이는 것을 막는다) */
+html[data-theme="ocean"] .tile-video-wrap { background: rgba(2, 16, 28, .6); }
+html[data-theme="ocean"] .tile-video-wrap video { background: #000; }
+.tile-badge {
+  position: absolute; right: 4px; bottom: 4px; background: var(--badge-bg);
+  padding: 2px 6px; border-radius: 3px; font-size: 10px; color: var(--text-dim);
+}
+/* 8분할의 작은 화면에 마우스를 올리면 나타나는 "크게보기" — 누르면 그 채널이 왼쪽 위 큰 화면과 자리를 바꾼다.
+   채널이 없는 칸, 이미 큰 화면인 칸, ⛶ 한 타일 보기 중, ROI/유속보정 편집 중에는 보이지 않는다. */
+.tile-bigview {
+  display: none; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 4;
+  padding: 5px 12px; font-size: 12px; border-radius: var(--radius);
+  background: var(--float-bg); border: 1px solid var(--accent); color: var(--text); cursor: pointer;
+}
+.tile-bigview:hover { background: var(--armed-bg); }
+.grid-8:not(.solo-active) > .tile.has-channel:not(:first-child):hover .tile-video-wrap:not(.roi-edit) .tile-bigview { display: block; }
+.roi-chips { display: flex; gap: 3px; padding: 2px 4px; flex-wrap: wrap; background: var(--chips-bg); }
+.roi-chip { font-size: 10px; padding: 1px 5px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
+.roi-chip.selected { border-color: var(--accent-2); }
+html[data-theme="ocean"] .roi-chip.selected { box-shadow: 0 0 8px rgba(61, 227, 255, .4); }
+
+.roi-draft-toolbar, .roi-edit-form {
+  position: absolute; left: 4px; top: 4px; background: var(--float-bg);
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 6px; font-size: 11px; z-index: 5;
+  display: flex; flex-direction: column; gap: 4px; min-width: 160px;
+  backdrop-filter: var(--glass);
+  -webkit-backdrop-filter: var(--glass);
+}
+.roi-edit-form label { display: flex; justify-content: space-between; gap: 6px; }
+.roi-edit-form input[type=text], .roi-edit-form input[type=number] { width: 90px; }
+.roi-edit-form .btn-row { display: flex; gap: 4px; justify-content: flex-end; }
+/* 수정할 ROI 고르기 — 개수가 많아도 툴바가 가로로 삐져나가지 않게 접어 넣는다 */
+.roi-draft-toolbar .roi-pick-row { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-start; max-width: 260px; }
+.roi-draft-toolbar .pick-sub { color: var(--text-dim); }
+/* 판정 기준 선택 (침범률 % / 물높이 m) */
+.roi-edit-form .roi-mode { display: flex; gap: 10px; padding: 4px 0; margin: 2px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.roi-edit-form .roi-mode-opt { justify-content: flex-start; align-items: center; gap: 3px; cursor: pointer; }
+.roi-edit-form [data-mode-box] { display: flex; flex-direction: column; gap: 4px; }
+/* display를 지정했으므로 hidden 속성이 먹히도록 명시해야 한다 (안 그러면 두 모드가 같이 보인다) */
+.roi-edit-form [data-mode-box][hidden] { display: none; }
+.roi-edit-form .hint { max-width: 240px; white-space: normal; line-height: 1.45; font-size: 10px; }
+/* 유속 ROI인데 채널 보정이 없을 때 — 설명 팁(.tip)이 아니라 상태 경고라 개발자 모드와 무관하게 항상 보인다 */
+.roi-edit-form .calib-warn { max-width: 240px; white-space: normal; line-height: 1.45; font-size: 10px; color: var(--warn); }
+
+/* ---------- 유속 보정 편집기 (flowCalibEditor.js) ---------- */
+.flow-calib-form { max-height: calc(100% - 8px); overflow-y: auto; min-width: 230px; }
+.flow-calib-form.fc-right { left: auto; right: 4px; }
+.flow-calib-form .fc-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.flow-calib-form .fc-head button { padding: 0 6px; }
+.flow-calib-form .fc-table { border-collapse: collapse; }
+.flow-calib-form .fc-table th { font-weight: 600; color: var(--text-dim); text-align: left; padding: 1px 3px; }
+.flow-calib-form .fc-table td { padding: 1px 3px; }
+.flow-calib-form .fc-table input[type=number] { width: 72px; }
+.flow-calib-form .fc-table button { padding: 0 5px; }
+.flow-calib-form .fc-pt { color: #ffd23a; font-weight: 700; }
+.flow-calib-form .fc-tape { display: flex; flex-direction: column; gap: 3px; }
+/* 라벨 길이가 제각각(P1–P2 / P1–P3 (대각))이라 칸을 고정해 입력란을 한 줄로 맞춘다 */
+.flow-calib-form .fc-tape label { display: grid; grid-template-columns: 96px 72px auto; align-items: center; gap: 4px; justify-content: start; }
+.flow-calib-form .fc-tape input[type=number] { width: 72px; }
+.flow-calib-form .fc-status { max-width: 240px; white-space: normal; line-height: 1.45; font-size: 10.5px; padding: 3px 5px; border-radius: 3px; }
+.flow-calib-form .fc-status.info { color: var(--text-dim); }
+.flow-calib-form .fc-status.ok { color: var(--ok); background: rgba(74, 222, 128, .08); }
+.flow-calib-form .fc-status.warn { color: var(--warn); background: rgba(255, 176, 32, .08); }
+.flow-calib-form .fc-status.err { color: #ff6b6b; background: rgba(255, 92, 92, .1); }
+
+/* ---------- 채널 확대 보기 (타일 더블클릭) ---------- */
+.zoom-overlay {
+  position: absolute; inset: 0; z-index: 30; padding: 14px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--backdrop-zoom);
+}
+.zoom-overlay.hidden { display: none; }
+.zoom-box {
+  width: min(1700px, 96%); height: 96%;
+  display: flex; overflow: hidden; padding: 4px;
+  background: var(--panel); border: 1px solid var(--accent); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: var(--glass);
+  -webkit-backdrop-filter: var(--glass);
+}
+/* 확대된 타일은 상자를 꽉 채운다 (영상도 object-fit: fill이라 확대 상자 안을 여백 없이 채운다) */
+.zoom-box .tile { flex: 1; min-width: 0; }
+/* 확대 중에는 원래 셀을 자리표시자로 채워 둔다 — 뒤에 깔린 분할 화면이 밀리지 않아야 닫을 때 그대로 돌아온다 */
+.tile-zoom-placeholder {
+  align-items: center; justify-content: center;
+  border-style: dashed; color: var(--text-dim); font-size: 11px; text-align: center; padding: 6px;
+}
+/* 확대 닫기(×)는 확대 중에만 보인다. 확대 중에는 solo 확대(⛶)를 숨긴다.
+   (채널 해제 × 버튼은 채널 전체 자동 배치로 바뀌면서 없앴다 — 화면에서 빼려면 설정에서 채널을 삭제한다) */
+.tile-actions .act-zoom-close { display: none; }
+/* 빼기(×)는 사용자분할에서 채널이 있는 타일에만 보인다. 확대 보기 중에는 ×가 "확대 닫기" 하나뿐이어야 헷갈리지 않는다. */
+.tile-actions .act-remove { display: none; }
+.grid-custom .tile.has-channel .act-remove { display: block; }
+/* 사용자분할의 빈 칸 안내 (기본 문구는 "끌어다 놓으면 옮깁니다"라 여기서는 맞지 않는다) */
+.grid-custom .tile:not(.has-channel) .tile-empty-placeholder { font-size: 0; }
+.grid-custom .tile:not(.has-channel) .tile-empty-placeholder::after { content: '빈 칸 — 왼쪽 목록에서 채널을 클릭해 추가'; font-size: 11px; }
+.tile.is-zoomed .act-expand { display: none; }
+.tile.is-zoomed .act-zoom-close { display: block; border-color: var(--accent); background: var(--armed-bg); }
+.tile.is-zoomed .act-zoom-close:hover { background: var(--armed-hover); }
+/* 넓어진 만큼 제목/버튼/칩도 읽기 좋은 크기로 키운다 */
+.tile.is-zoomed .tile-titlebar { font-size: 13px; padding: 5px 8px; }
+.tile.is-zoomed .tile-actions button { font-size: 12px; padding: 3px 8px; }
+.tile.is-zoomed .roi-chip { font-size: 12px; padding: 2px 8px; }
+.tile.is-zoomed .tile-badge { font-size: 12px; padding: 3px 8px; }
+
+/* ---------- Side event panel ---------- */
+.side-panel {
+  width: 300px; background: var(--panel); border-left: 1px solid var(--border);
+  display: flex; flex-direction: column; flex-shrink: 0;
+  backdrop-filter: var(--glass);
+  -webkit-backdrop-filter: var(--glass);
+}
+.side-panel.hidden { display: none; }
+.panel-header { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid var(--border); font-weight: 600; }
+#eventList { list-style: none; margin: 0; padding: 4px; overflow-y: auto; flex: 1; }
+#eventList li { padding: 6px; border-bottom: 1px solid var(--border); font-size: 11px; }
+#eventList li .ev-title { font-weight: 600; color: var(--danger); }
+#eventList li.acked .ev-title { color: var(--text-dim); }
+#eventList li .ev-meta { color: var(--text-dim); }
+#eventList li button { margin-top: 3px; }
+
+/* ---------- Unlock overlay ---------- */
+#unlockOverlay {
+  position: fixed; inset: 0; background: var(--backdrop-unlock); display: flex; align-items: center; justify-content: center; z-index: 100;
+}
+#unlockOverlay.hidden { display: none; }
+.unlock-box {
+  background: var(--panel); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius-lg); text-align: center;
+  backdrop-filter: var(--glass);
+  -webkit-backdrop-filter: var(--glass);
+}
+.unlock-box button {
+  margin-top: 12px; font-size: 14px; padding: 10px 18px;
+  background: var(--accent-btn-bg); border-color: var(--accent-btn-border); color: var(--on-accent); box-shadow: var(--accent-btn-shadow);
+}
+
+/* ---------- Alarm toasts ---------- */
+/* top 82px = 감시 상태 띠(26) + 상단바(46) + 여백. 하이드로 차트는 자기 절에서 따로 지정 */
+#alarmToastContainer { position: fixed; top: 82px; right: 12px; z-index: 90; display: flex; flex-direction: column; gap: 8px; width: 280px; }
+.alarm-toast {
+  background: var(--toast-bg); border: 1px solid var(--danger); border-radius: var(--radius-lg); padding: 10px; box-shadow: var(--toast-shadow);
+  animation: toast-in .15s ease-out;
+  backdrop-filter: var(--glass);
+  -webkit-backdrop-filter: var(--glass);
+}
+.alarm-toast.cleared { border-color: var(--text-dim); opacity: .7; }
+@keyframes toast-in { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.alarm-toast .at-title { font-weight: 700; color: var(--toast-title); display: flex; justify-content: space-between; }
+.alarm-toast .at-meta { color: var(--text-dim); font-size: 11px; margin: 4px 0; }
+.alarm-toast img { width: 100%; border-radius: var(--radius); margin: 4px 0; }
+.alarm-toast .at-actions { display: flex; gap: 6px; }
+
+/* ---------- Settings modal ---------- */
+.modal { position: fixed; inset: 0; background: var(--backdrop); display: flex; align-items: center; justify-content: center; z-index: 80; }
+.modal.hidden { display: none; }
+/* 860px: TCP 소스 탭에 "모드" 열, 채널 탭에 "소스" 열이 추가되어 720px에서는 버튼/라벨이 줄바꿈됨 */
+.modal-box {
+  /* 채널 표에 선택 열이 생기면서 860px에서는 RTSP 주소 칸이 잘렸다 — 그만큼 넓힌다. */
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 920px; max-width: 94vw; max-height: 86vh;
+  display: flex; flex-direction: column; position: relative; padding: 10px 14px 14px;
+  backdrop-filter: var(--glass);
+  -webkit-backdrop-filter: var(--glass);
+}
+html[data-theme="ocean"] .modal-box { box-shadow: var(--shadow-lg); }
+/* 드래그 중에는 그림자를 키워 "떠 있는" 느낌을 주고, 텍스트 선택은 막는다 */
+.modal-box.dragging { box-shadow: 0 12px 40px rgba(0,0,0,.55); user-select: none; }
+/* 제목 표시줄 = 드래그 손잡이. 여기 말고 다른 곳을 끌어서는 창이 움직이지 않는다. */
+.modal-header { display: flex; align-items: center; gap: 10px; padding-bottom: 8px; cursor: move; touch-action: none; }
+.modal-title { font-weight: 600; font-size: 13px; }
+.modal-drag-hint { flex: 1; color: var(--text-dim); font-size: 10px; }
+.modal-close { cursor: pointer; }
+.modal-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 10px; }
+.modal-tabs button.active { background: var(--accent-btn-bg); border-color: var(--accent-btn-border); color: var(--on-accent); box-shadow: var(--accent-btn-shadow); }
+html[data-theme="ocean"] .modal-tabs button { border-radius: 999px; }
+.modal-panels { overflow-y: auto; flex: 1; }
+.modal-panel { display: none; }
+.modal-panel.active { display: block; }
+.modal-panel h3 { margin-top: 0; }
+.modal-panel .hint { color: var(--text-dim); font-size: 11px; }
+.cfg-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+.cfg-table th, .cfg-table td { border-bottom: 1px solid var(--border); padding: 4px 6px; font-size: 11px; text-align: left; }
+html[data-theme="ocean"] .cfg-table tbody tr:hover { background: rgba(61, 227, 255, .04); }
+/* 상태/체크박스/버튼 열은 줄바꿈되면 읽기 나쁘므로 한 줄 유지 (텍스트 입력 열은 그대로 늘어남) */
+.cfg-table th, .cfg-table td button, .cfg-table td .hint { white-space: nowrap; }
+/* TCP 표의 상태 칸("연결됨", "수신중 (2대)")도 한 줄 유지 — "번호 기준" 열이 생긴 뒤 (구)데이라이트 테마에서 "연/결됨"으로 갈라졌다 */
+.cfg-table td[data-status-conn] { white-space: nowrap; }
+/* min-width:0 이 없으면 input이 기본 폭(약 20자)만큼 자리를 요구해 표가 모달보다 넓어진다(창이 좁을 때 잘림) */
+.cfg-table input[type=text], .cfg-table input[type=number] { width: 100%; min-width: 0; }
+.cfg-table .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; background: var(--dot-off); vertical-align: middle; }
+.cfg-table .dot.connected { background: var(--ok); }
+.cfg-table .dot.connecting { background: var(--warn); }
+.cfg-table .dot.listening { background: var(--accent-2); }
+.cfg-table .dot.error, .cfg-table .dot.disconnected { background: var(--danger); }
+/* ---- 자세한 설명 팁 (.tip) ----
+   평소에는 화면을 간결하게 유지하기 위해 감춰 두고, 개발자 모드(설정 > Help)에서만 보여준다.
+   상태/데이터 표시용 .hint(예: "수신 중인 좌표 없음", cam 제목)는 .tip이 아니므로 항상 보인다. */
+body:not(.dev-mode) .tip { display: none; }
+
+/* ---- 화면 테마 탭 ----
+   테마마다 카드 하나. 카드 안의 작은 화면 모형(.tp)은 "그 테마를 고르면 어떻게 보이는지"를 보여주는 것이므로
+   현재 테마와 무관하게 자기 테마의 색으로 그려져야 한다 — 그래서 여기만은 변수 대신 고정 색을 쓴다. */
+.theme-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin: 10px 0 14px; }
+.theme-card {
+  padding: 10px; border-radius: var(--radius-lg); border: 1px solid var(--border); background: var(--panel-2);
+  display: flex; flex-direction: column; gap: 6px; cursor: pointer; user-select: none; outline: none;
+}
+.theme-card:hover, .theme-card:focus-visible { border-color: var(--accent-2); }
+.theme-card.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--accent-btn-shadow); }
+.theme-card-name { font-weight: 700; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+.theme-card-state { font-size: 11px; color: var(--ok); font-weight: 600; }
+.theme-card-desc { font-size: 11px; color: var(--text-dim); line-height: 1.45; white-space: normal; }
+.tp { height: 104px; border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid rgba(255, 255, 255, .08); }
+.tp-top { height: 18px; display: flex; align-items: center; gap: 4px; padding: 0 6px; flex-shrink: 0; }
+.tp-top i { width: 16px; height: 8px; border-radius: 2px; display: block; }
+.tp-top i.brand { width: 28px; }
+.tp-body { flex: 1; display: flex; min-height: 0; }
+.tp-side { width: 24%; }
+.tp-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px; }
+.tp-grid b { display: block; border-radius: 2px; min-height: 0; }
+/* 클래식 다크 모형 */
+.tp-classic { background: #05070a; border-top: 5px solid #080b10; } /* 맨 위 감시 상태 띠 */
+.tp-classic .tp-top { background: #161b22; border-bottom: 1px solid #2a3342; }
+.tp-classic .tp-top i { background: #1c2330; }
+.tp-classic .tp-top i.brand { background: #58a6ff; }
+.tp-classic .tp-top i.on { background: #2f8fdb; }
+.tp-classic .tp-side { background: #161b22; border-right: 1px solid #2a3342; }
+.tp-classic .tp-grid b { background: linear-gradient(180deg, #1d2532 0 22%, #0a0d12 22%); border: 1px solid #2a3342; }
+.tp-classic .tp-grid b.alarm { border-color: #ff4d4f; box-shadow: inset 0 0 0 1px #ff4d4f; }
+/* 딥 오션 모형 */
+.tp-ocean {
+  background:
+    radial-gradient(90px 56px at 14% 0%, rgba(61, 227, 255, .35), transparent 70%),
+    radial-gradient(80px 50px at 92% 110%, rgba(15, 168, 189, .35), transparent 70%),
+    linear-gradient(180deg, #072538, #04131f);
+  border-top: 5px solid #021220; /* 맨 위 감시 상태 띠 */
+}
+.tp-ocean .tp-top { background: rgba(9, 44, 66, .85); box-shadow: 0 1px 0 rgba(61, 227, 255, .45); }
+.tp-ocean .tp-top i { background: rgba(20, 78, 108, .8); border-radius: 4px; }
+.tp-ocean .tp-top i.brand { background: #3de3ff; box-shadow: 0 0 6px rgba(61, 227, 255, .7); }
+.tp-ocean .tp-top i.on { background: linear-gradient(135deg, #12b5c9, #2f6fe0); }
+.tp-ocean .tp-side { background: rgba(7, 34, 52, .75); border-right: 1px solid rgba(94, 205, 235, .22); }
+.tp-ocean .tp-grid b { background: linear-gradient(180deg, rgba(18, 84, 116, .9) 0 22%, rgba(3, 16, 26, .85) 22%); border: 1px solid rgba(94, 205, 235, .3); border-radius: 4px; }
+.tp-ocean .tp-grid b.alarm { border-color: #ff5c7a; box-shadow: 0 0 8px rgba(255, 92, 122, .6), inset 0 0 0 1px #ff5c7a; }
+/* 하이드로 차트 모형 — 맨 위 남색 상태 띠, 종이색 상단바(아래 잉크 두 줄), 등고선 바탕, 번호표가 붙은 잉크 선 타일, 주홍 경보 타일 */
+.tp-hydro {
+  background:
+    repeating-radial-gradient(ellipse 140% 90% at 8% 0%, transparent 0 9px, rgba(20, 38, 61, .09) 9px 10px),
+    #efebe2;
+  border-top: 6px solid #14263d;
+}
+.tp-hydro .tp-top { height: 18px; background: #faf8f3; border-bottom: 2px solid #14263d; }
+.tp-hydro .tp-top i { background: transparent; border: 1px solid #14263d; border-radius: 1px; height: 9px; }
+.tp-hydro .tp-top i.brand { background: #14263d; border: none; height: 6px; width: 30px; }
+.tp-hydro .tp-top i.on { background: #14263d; }
+.tp-hydro .tp-side { background: rgba(250, 248, 243, .9); border-right: 1px solid #14263d; }
+.tp-hydro .tp-grid { gap: 4px; padding: 4px; }
+.tp-hydro .tp-grid b {
+  background: linear-gradient(90deg, #14263d 0 18%, transparent 18%) 0 0 / 100% 22% no-repeat,
+    linear-gradient(180deg, #faf8f3 0 22%, #14263d 22% calc(22% + 1px), #1a2129 calc(22% + 1px));
+  border: 1px solid rgba(20, 38, 61, .6); border-radius: 1px; box-shadow: 2px 2px 0 rgba(20, 38, 61, .14);
+}
+.tp-hydro .tp-grid b.alarm {
+  background: linear-gradient(180deg, #d6401a 0 22%, #1a2129 22%);
+  border-color: #d6401a; box-shadow: 2px 2px 0 rgba(214, 64, 26, .35);
+}
+
+/* ---- Help 탭 / 개발자 모드 ---- */
+.help-table { display: inline-grid; grid-template-columns: auto auto; gap: 6px 16px; font-size: 12px; margin-bottom: 14px; }
+/* 행 div 자체가 그리드 칸을 차지하면 두 행이 가로로 늘어서므로, 안쪽 span들이 직접 칸에 들어가게 한다. */
+.help-row { display: contents; }
+.help-key { color: var(--text-dim); }
+/* 버전 숫자를 5번 클릭하면 개발자 모드 잠금 해제 상자가 나온다 — 눈에 띄는 안내는 일부러 두지 않는다. */
+.version-value { cursor: default; user-select: none; }
+.dev-box { border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 10px 12px; max-width: 420px; }
+/* 이 프로젝트에는 공통 .hidden 규칙이 없고 컴포넌트마다 따로 정의한다 — 여기도 직접 지정한다. */
+.dev-box.hidden { display: none; }
+.dev-box.dev-box-on { border-color: var(--ok); }
+.dev-box-title { font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+.dev-msg { font-size: 11px; color: var(--text-dim); margin: 6px 0; min-height: 14px; }
+.dev-msg.error { color: var(--danger); }
+.dev-msg.ok { color: var(--ok); }
+
+/* ---- 실시간 수신 현황 (cam ID 설정 대조용) ---- */
+.recv-box { border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 8px 10px; margin-bottom: 10px; background: var(--recv-box-bg); }
+.recv-title { font-size: 11px; font-weight: 600; margin-bottom: 6px; }
+.recv-row { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px; margin-top: 4px; font-size: 11px; }
+.recv-src { min-width: 150px; color: var(--text-dim); }
+.recv-warn { margin-top: 6px; padding: 4px 6px; border-radius: var(--radius); background: var(--warn-box-bg); color: var(--warn-box-text); font-size: 11px; }
+.cam-chip { display: inline-block; padding: 1px 6px; border-radius: 10px; border: 1px solid var(--border); font-size: 11px; white-space: nowrap; }
+.cam-chip.ok { border-color: var(--ok); color: var(--ok); }
+.cam-chip.warn { border-color: var(--warn); color: var(--warn); background: rgba(255,176,32,.08); }
+/* 채널 표의 cam ID 칸 옆 수신 표시 */
+.recv-badge { display: block; margin-top: 2px; font-size: 10px; white-space: nowrap; color: var(--text-dim); }
+.recv-badge.ok { color: var(--ok); }
+.recv-badge.off { color: var(--warn); }
+
+/* ---- 표 위 도구 모음 + 여러 채널 한 번에 추가/삭제 ----
+   채널이 수십 개가 되면 한 줄씩 지우는 것이 현실적이지 않으므로, 행을 골라 한 번에 처리한다. */
+.table-toolbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.table-toolbar .tb-spacer { flex: 1; }
+.table-toolbar .tb-count { font-size: 11px; color: var(--text-dim); }
+/* 줄바꿈 없이 줄어들다 잘리는 일이 없도록 — 폭이 모자라면 버튼 줄 자체가 다음 줄로 내려간다 */
+.table-toolbar button { padding: 3px 8px; font-size: 11px; white-space: nowrap; flex-shrink: 0; }
+button:disabled { opacity: .45; cursor: default; }
+button:disabled:hover { background: var(--btn-bg); }
+
+/* 선택 열은 체크박스 하나만 들어가므로 최대한 좁게 — 그래야 RTSP 주소 칸이 안 좁아진다 */
+/* 오른쪽 "사용" 체크박스와 헷갈리지 않도록 선택 열은 세로줄로 구분한다 */
+.cfg-table th.col-sel, .cfg-table td.col-sel { width: 24px; text-align: center; padding-left: 4px; padding-right: 4px; border-right: 1px solid var(--border); }
+.cfg-table tr.row-selected { background: var(--row-selected-bg); }
+.cfg-table tr.add-row td.col-sel { color: var(--text-dim); }
+
+.bulk-box { border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 10px; margin-bottom: 10px; background: var(--recv-box-bg); }
+.bulk-box.hidden { display: none; }
+.bulk-title { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.bulk-box textarea {
+  width: 100%; resize: vertical; font-size: 11px; line-height: 1.5;
+  font-family: Consolas, "Courier New", monospace;
+  background: var(--input-bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px;
+}
+.bulk-box textarea:focus { outline: none; border-color: var(--accent-2); box-shadow: var(--focus-ring); }
+.bulk-opts { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 11px; margin: 6px 0; }
+.bulk-opts label { display: flex; align-items: center; gap: 4px; }
+.bulk-preview { margin: 6px 0; font-size: 11px; line-height: 1.6; word-break: break-all; }
+.bulk-preview .err { color: var(--danger); }
+.bulk-preview .ok { color: var(--ok); }
+
+/* ---- 설정 백업 탭 ---- */
+.backup-export { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 4px 0 10px; }
+.backup-export .save-btn { margin-top: 0; }
+/* 내보내기는 다운로드 링크(<a download>)라 버튼 모양을 직접 입힌다 */
+a.btn-link { display: inline-block; padding: 7px 14px; border: 1px solid var(--accent-btn-border); border-radius: var(--radius); text-decoration: none; font-weight: 600; font-size: 13px; }
+a.btn-link:hover { filter: brightness(1.1); }
+.backup-h { margin-top: 18px !important; }
+.backup-steps { margin: 6px 0 10px; padding-left: 22px; line-height: 1.7; font-size: 12px; }
+.backup-steps li { margin-bottom: 4px; }
+.backup-steps code, .modal-panel[data-panel="backup"] code { font-family: Consolas, "Courier New", monospace; font-size: 12px; padding: 1px 5px; border-radius: 3px; background: var(--input-bg); border: 1px solid var(--border); }
+.backup-path { display: flex; align-items: center; gap: 6px; margin: 4px 0 2px; }
+.backup-path code { font-size: 13px !important; padding: 3px 8px !important; user-select: all; }
+.small-btn { padding: 2px 8px; font-size: 11px; }
+
+.add-row-btn { margin-bottom: 8px; }
+.save-btn { background: var(--accent-btn-bg); border-color: var(--accent-btn-border); color: var(--on-accent); margin-top: 10px; box-shadow: var(--accent-btn-shadow); }
+.danger-btn { background: var(--danger-btn-bg); border-color: var(--danger); color: var(--danger-btn-text); }
+.danger-btn.small { padding: 2px 6px; font-size: 10px; }
+.danger-zone { margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+.row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+
+/* =====================================================================
+   하이드로 차트 테마 배치
+   ---------------------------------------------------------------------
+   색은 위 변수 블록이 정하고, 여기서는 배치/크기/글꼴/장식만 바꾼다. 모든 규칙이 html[data-theme="hydro"]로 시작하므로
+   다른 테마에는 영향이 없다. 주의: 이 접두사가 붙으면 명시도가 (0,1,x) 이상으로 올라가 `.tile-actions button` 같은 기본
+   규칙을 덮어쓰므로, 작아야 하는 버튼(타일 제목줄 등)은 여기서 다시 크기를 지정해 둔다.
+   장식은 전부 정적 그라디언트(그리기 비용 거의 없음). 움직이는 것은 경보 표시뿐이다 — 감시 화면에서 평소 움직임은 시선을 빼앗는다.
+   ===================================================================== */
+html[data-theme="hydro"] body {
+  font-family: "Bahnschrift", "Segoe UI", "Malgun Gothic", sans-serif;
+  font-size: 13.5px;
+  /* 등고선 두 묶음(왼쪽 위 남색, 오른쪽 아래 물빛) + 24px 모눈 + 종이색 */
+  background:
+    repeating-radial-gradient(ellipse 140% 90% at 6% -4%, transparent 0 34px, rgba(20, 38, 61, .055) 34px 35px),
+    repeating-radial-gradient(ellipse 120% 100% at 102% 104%, transparent 0 46px, rgba(10, 126, 164, .07) 46px 47px),
+    linear-gradient(rgba(20, 38, 61, .035) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, rgba(20, 38, 61, .035) 1px, transparent 1px) 0 0 / 24px 24px,
+    #efebe2;
+}
+html[data-theme="hydro"] button { font-size: 12.5px; font-family: inherit; }
+html[data-theme="hydro"] input, html[data-theme="hydro"] select { padding: 5px 8px; font-size: 13px; font-family: inherit; }
+html[data-theme="hydro"] ::-webkit-scrollbar { width: 11px; height: 11px; }
+html[data-theme="hydro"] ::-webkit-scrollbar-track { background: transparent; }
+html[data-theme="hydro"] ::-webkit-scrollbar-thumb { background: rgba(20, 38, 61, .25); border-radius: 2px; border: 3px solid transparent; background-clip: padding-box; }
+html[data-theme="hydro"] ::-webkit-scrollbar-thumb:hover { background: rgba(20, 38, 61, .45); border: 3px solid transparent; background-clip: padding-box; }
+html[data-theme="hydro"] .xl-only { display: inline; }
+
+/* -- 감시 상태 띠 (app.js renderWatchStatus) -- */
+html[data-theme="hydro"] .watch-status {
+  display: flex; align-items: center; gap: 16px; height: 30px; padding: 0 16px; flex-shrink: 0;
+  background: var(--ink); color: #e9e3d6; font-size: 12.5px; white-space: nowrap; overflow: hidden; border-bottom: none;
+}
+html[data-theme="hydro"] .ws-state { display: flex; align-items: center; gap: 8px; font-weight: 700; letter-spacing: 1.5px; color: inherit; }
+html[data-theme="hydro"] .ws-lamp { width: 9px; height: 9px; border-radius: 50%; background: #3ddc84; box-shadow: 0 0 0 3px rgba(61, 220, 132, .22); }
+html[data-theme="hydro"] .ws-spacer { flex: 1; }
+html[data-theme="hydro"] .ws-metrics { display: flex; gap: 16px; color: #aab6c4; }
+html[data-theme="hydro"] .ws-metrics b { color: #fff; font-weight: 600; font-variant-numeric: tabular-nums; }
+html[data-theme="hydro"] .ws-metrics small { color: #8593a3; }
+html[data-theme="hydro"] .ws-clock { font-variant-numeric: tabular-nums; letter-spacing: 1px; padding-left: 16px; border-left: 1px solid rgba(233, 227, 214, .25); }
+html[data-theme="hydro"] .ws-detail { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* 경보: 주홍 사선 줄무늬(위험 표지) + 점멸 램프. 어느 화면을 보고 있든 화면 맨 위에서 보인다 */
+html[data-theme="hydro"] .watch-status.alarm {
+  background: repeating-linear-gradient(-45deg, #d6401a 0 16px, #bf3512 16px 32px);
+  color: #fff;
+}
+html[data-theme="hydro"] .watch-status.alarm .ws-lamp { background: #fff; box-shadow: 0 0 0 3px rgba(255, 255, 255, .35); animation: pg-blink 1s infinite; }
+html[data-theme="hydro"] .watch-status.alarm .ws-metrics,
+html[data-theme="hydro"] .watch-status.alarm .ws-metrics small { color: rgba(255, 255, 255, .8); }
+html[data-theme="hydro"] .watch-status.alarm .ws-clock { border-left-color: rgba(255, 255, 255, .35); }
+html[data-theme="hydro"] .ws-goto {
+  height: 22px; padding: 0 12px; border: none; border-radius: 2px; background: #fff; color: #b8320f; font-weight: 700; flex-shrink: 0;
+}
+html[data-theme="hydro"] .ws-goto:hover { background: #ffe9e1; }
+
+/* -- 상단바: 종이색 표제란, 아래 잉크 두 줄(도면 표제란처럼) -- */
+html[data-theme="hydro"] #topbar {
+  height: 54px; gap: 14px; padding: 0 16px; z-index: 2;
+  background: rgba(250, 248, 243, .92); border-bottom: 2px solid var(--ink);
+}
+html[data-theme="hydro"] #topbar::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -5px; height: 1px; background: var(--ink); opacity: .45; pointer-events: none;
+}
+/* #topbar로 한정 — 설정 > 화면 테마 카드의 모형(.tp-top i.brand)도 .brand 클래스를 쓴다 */
+html[data-theme="hydro"] #topbar .brand { font-size: 16px; letter-spacing: 2px; text-transform: uppercase; padding-right: 16px; border-right: 1px solid var(--border); line-height: 1.15; }
+html[data-theme="hydro"] #topbar .brand span { color: var(--accent-2); }
+html[data-theme="hydro"] #topbar .brand::after { content: 'FLOOD WATCH · 침수 감시'; display: block; font-size: 9.5px; letter-spacing: 2.5px; font-weight: 400; color: var(--text-dim); }
+/* 분할 버튼: 잉크 선으로 묶인 한 덩어리(세그먼트), 선택된 칸은 잉크로 채움 */
+html[data-theme="hydro"] .layout-switch { gap: 0; border: 1px solid var(--ink); border-radius: var(--radius); overflow: hidden; background: var(--paper); }
+html[data-theme="hydro"] .layout-switch button {
+  display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 11px;
+  background: transparent; border: none; border-right: 1px solid rgba(20, 38, 61, .22); border-radius: 0; color: var(--text);
+}
+html[data-theme="hydro"] .layout-switch button:last-child { border-right: none; }
+html[data-theme="hydro"] .layout-switch button:hover { background: var(--btn-hover); }
+html[data-theme="hydro"] .layout-switch button.active { background: var(--ink); color: var(--paper); box-shadow: none; }
+/* 분할 모양 격자 아이콘 — 글자색(currentColor) 선을 그라디언트로 그린다 */
+html[data-theme="hydro"] .lg-ico { display: block; width: 16px; height: 16px; border: 1.5px solid currentColor; border-radius: 1px; background-repeat: no-repeat; }
+html[data-theme="hydro"] [data-layout="4"] .lg-ico {
+  background-image: linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor);
+  background-size: 1.5px 100%, 100% 1.5px; background-position: 50% 0, 0 50%;
+}
+/* 8분할: 4x4 격자 중 왼쪽 위 3x3이 한 칸 — 긴 선 2개(75%) + 아래 줄/오른쪽 열에만 있는 짧은 선 4개 */
+html[data-theme="hydro"] [data-layout="8"] .lg-ico,
+html[data-theme="hydro"] [data-layout="custom"] .lg-ico {
+  background-image: linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor);
+  background-size: 1.5px 100%, 100% 1.5px, 1.5px 25%, 1.5px 25%, 25% 1.5px, 25% 1.5px;
+  background-position: 75% 0, 0 75%, 25% 100%, 50% 100%, 100% 25%, 100% 50%;
+}
+html[data-theme="hydro"] [data-layout="16"] .lg-ico {
+  background-image: linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor);
+  background-size: 1.5px 100%, 1.5px 100%, 1.5px 100%, 100% 1.5px, 100% 1.5px, 100% 1.5px;
+  background-position: 25% 0, 50% 0, 75% 0, 0 25%, 0 50%, 0 75%;
+}
+html[data-theme="hydro"] [data-layout="36"] .lg-ico {
+  background-image: repeating-linear-gradient(90deg, transparent 0 calc(100% / 6 - 1px), currentColor calc(100% / 6 - 1px) calc(100% / 6)),
+    repeating-linear-gradient(0deg, transparent 0 calc(100% / 6 - 1px), currentColor calc(100% / 6 - 1px) calc(100% / 6));
+  background-repeat: repeat;
+}
+/* 화면 페이지 지도 */
+html[data-theme="hydro"] .page-tabs { gap: 3px; align-self: stretch; padding-left: 14px; border-left: 1px solid var(--border); }
+html[data-theme="hydro"] .pg-arrow { border-color: var(--ink); border-radius: 2px; background: var(--paper); }
+html[data-theme="hydro"] .pg-count { font-size: 13px; }
+html[data-theme="hydro"] .pg-alarm-note { border-radius: 2px; }
+/* 추론 소스 연결 상태: 상단바 안의 계기 칩 */
+html[data-theme="hydro"] .status-lights { gap: 6px; font-size: 11.5px; color: var(--text); }
+html[data-theme="hydro"] .status-lights > span { display: inline-flex; align-items: center; padding: 2px 9px; border: 1px solid var(--border); border-radius: 999px; background: var(--paper); white-space: nowrap; }
+html[data-theme="hydro"] .status-lights .dot { width: 8px; height: 8px; margin-right: 6px; }
+html[data-theme="hydro"] .status-lights .dot.connected { box-shadow: 0 0 0 2px rgba(31, 138, 85, .2); }
+/* 오른쪽 도구 버튼: 아이콘 + 이름, 잉크 선 */
+html[data-theme="hydro"] .toolbar-actions { gap: 6px; }
+html[data-theme="hydro"] .toolbar-actions .tb-btn {
+  display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px;
+  background: var(--paper); border: 1px solid var(--ink); border-radius: var(--radius); color: var(--text);
+}
+html[data-theme="hydro"] .toolbar-actions .tb-btn:hover { background: var(--ink); color: var(--paper); }
+html[data-theme="hydro"] .toolbar-actions .tb-btn .ico { font-size: 15px; line-height: 1; }
+
+/* -- 채널 목록: 도면의 범례/색인처럼 점선으로 나뉜 줄 -- */
+html[data-theme="hydro"] #sidebar { width: 236px; padding: 12px 10px 10px; gap: 8px; background: rgba(250, 248, 243, .9); border-right: 1px solid var(--ink); }
+html[data-theme="hydro"] #sidebar::before {
+  content: 'CHANNEL INDEX · 채널 목록'; font-size: 10.5px; letter-spacing: 2px; font-weight: 700; color: var(--text);
+  padding-bottom: 6px; border-bottom: 2px solid var(--ink);
+}
+html[data-theme="hydro"] #channelSearch { padding: 7px 10px; font-size: 13px; border-color: var(--ink); }
+html[data-theme="hydro"] .sidebar-hint { font-size: 11.5px; }
+html[data-theme="hydro"] #channelList li {
+  padding: 8px 8px 8px 10px; margin: 0; font-size: 13px;
+  background: transparent; border: none; border-bottom: 1px dashed rgba(20, 38, 61, .22); border-radius: 0;
+}
+html[data-theme="hydro"] #channelList li:hover { background: rgba(10, 126, 164, .07); }
+html[data-theme="hydro"] #channelList li .ch-dot { display: inline-block; vertical-align: middle; margin-right: 8px; width: 8px; height: 8px; }
+html[data-theme="hydro"] #channelList li .pg-no { font-size: 11px; padding: 0 5px; border: 1px solid var(--border); border-radius: 2px; line-height: 16px; }
+html[data-theme="hydro"] #channelList li.on-page { box-shadow: inset 3px 0 0 var(--ink); background: rgba(20, 38, 61, .04); }
+html[data-theme="hydro"] #channelList li.on-page .pg-no { color: var(--paper); background: var(--ink); border-color: var(--ink); }
+html[data-theme="hydro"] #channelList li.armed { background: var(--armed-bg); box-shadow: inset 3px 0 0 var(--accent-2); }
+html[data-theme="hydro"] #channelList li.picked { background: var(--armed-bg); box-shadow: inset 3px 0 0 var(--accent-2); }
+html[data-theme="hydro"] #channelList li.alarming { background: rgba(214, 64, 26, .12); box-shadow: inset 3px 0 0 var(--danger); color: #a52c0c; font-weight: 600; }
+html[data-theme="hydro"] .side-add-btn { background: transparent; color: var(--text); border: 1px dashed var(--ink); font-size: 13px; font-weight: 600; padding: 8px; }
+html[data-theme="hydro"] .side-add-btn:hover { background: var(--ink); color: var(--paper); border-style: solid; }
+
+/* -- 영상 타일: 잉크 선 카드 + 찍힌 듯한 그림자, 번호표(01, 02…), 영상 왼쪽 수위 눈금자 -- */
+html[data-theme="hydro"] #gridWrap { padding: 10px; }
+html[data-theme="hydro"] .grid { gap: 10px; counter-reset: cell; }
+html[data-theme="hydro"] .grid-dense { gap: 5px; }
+html[data-theme="hydro"] .tile { border-radius: 2px; box-shadow: 3px 3px 0 rgba(20, 38, 61, .12); counter-increment: cell; }
+html[data-theme="hydro"] .tile-titlebar {
+  font-size: 12.5px; font-weight: 600; padding: 0 6px 0 0; min-height: 26px; gap: 6px;
+  border-bottom: 1px solid var(--tile-border);
+}
+/* 번호표: 화면 안 칸 번호(페이지마다 01부터). 확대 보기(그리드 밖)에서는 의미가 없어 숨긴다 */
+html[data-theme="hydro"] .tile-titlebar::before {
+  content: counter(cell, decimal-leading-zero); align-self: stretch; display: flex; align-items: center; flex-shrink: 0;
+  padding: 0 7px; background: var(--ink); color: #efe9dc; font-size: 11px; font-weight: 600; letter-spacing: .5px;
+}
+html[data-theme="hydro"] .tile.is-zoomed .tile-titlebar::before { content: none; }
+html[data-theme="hydro"] .tile.is-zoomed .tile-titlebar { padding-left: 10px; }
+html[data-theme="hydro"] .tile-actions button { font-size: 11px; padding: 2px 7px; border-radius: 2px; }
+html[data-theme="hydro"] .grid-dense:not(.solo-active) .tile-titlebar { min-height: 0; padding: 0 4px 0 0; font-size: 10px; gap: 3px; }
+html[data-theme="hydro"] .grid-dense:not(.solo-active) .tile-titlebar::before { padding: 0 4px; font-size: 9px; }
+html[data-theme="hydro"] .grid-dense:not(.solo-active) .tile-actions button { padding: 0 4px; font-size: 9px; }
+/* 수위 눈금자: 영상 왼쪽 가장자리, 25%마다 긴 눈금 + 5%마다 짧은 눈금. 마우스는 통과한다 */
+html[data-theme="hydro"] .tile.has-channel .tile-video-wrap::after {
+  content: ''; position: absolute; left: 0; top: 8%; bottom: 8%; width: 10px; pointer-events: none; z-index: 1; opacity: .75;
+  border-left: 2px solid rgba(255, 255, 255, .6);
+  background:
+    repeating-linear-gradient(to top, rgba(255, 255, 255, .95) 0 1px, transparent 1px 25%) 0 0 / 10px 100% no-repeat,
+    repeating-linear-gradient(to top, rgba(255, 255, 255, .6) 0 1px, transparent 1px 5%) 0 0 / 5px 100% no-repeat;
+}
+html[data-theme="hydro"] .grid-dense:not(.solo-active) .tile-video-wrap::after { display: none; }
+/* 빈 칸: 도면의 빗금 + 조준 표시 */
+html[data-theme="hydro"] .tile-empty-placeholder {
+  flex-direction: column; gap: 6px; font-size: 12px;
+  background: repeating-linear-gradient(45deg, transparent 0 8px, rgba(20, 38, 61, .05) 8px 9px), var(--panel-2);
+}
+html[data-theme="hydro"] .tile-empty-placeholder::before { content: '⌖'; font-size: 28px; line-height: 1; color: var(--text-dim); opacity: .6; }
+html[data-theme="hydro"] .grid-dense:not(.solo-active) .tile-empty-placeholder::before { font-size: 16px; }
+html[data-theme="hydro"] .tile-badge { color: #efe9dc; border-radius: 2px; }
+/* 짙은 바탕이라 빈 배지가 검은 점으로 보인다. tile.js가 인라인 style로 display:block을 넣으므로 !important가 필요하다 */
+html[data-theme="hydro"] .tile-badge:empty { display: none !important; }
+html[data-theme="hydro"] .roi-chip { border-radius: 2px; }
+html[data-theme="hydro"] .roi-chip.selected { border-color: var(--ink); background: var(--armed-bg); }
+/* 경보 타일: 제목줄 전체가 주홍으로, 번호표는 짙은 주홍. 경보가 풀릴 때까지 유지(.tile-alarming), 발생 순간은 바깥 고리가 맥박친다(.tile-alarm) */
+html[data-theme="hydro"] .tile.tile-alarming { border-color: var(--danger); box-shadow: 3px 3px 0 rgba(214, 64, 26, .35), inset 0 0 0 2px var(--danger); }
+html[data-theme="hydro"] .tile.tile-alarming .tile-titlebar { background: var(--danger); color: #fff; border-bottom-color: var(--danger); }
+html[data-theme="hydro"] .tile.tile-alarming .tile-titlebar::before { background: #8f2208; }
+html[data-theme="hydro"] .tile.tile-alarm { animation: tile-pulse-hydro 1s infinite; }
+@keyframes tile-pulse-hydro {
+  0%, 100% { box-shadow: 0 0 0 5px rgba(214, 64, 26, .45), 3px 3px 0 rgba(214, 64, 26, .35); }
+  50% { box-shadow: 0 0 0 1px rgba(214, 64, 26, .15), 3px 3px 0 rgba(214, 64, 26, .35); }
+}
+html[data-theme="hydro"] .tile.drag-over { border-color: var(--accent-2); box-shadow: inset 0 0 0 2px var(--accent-2), 3px 3px 0 rgba(10, 126, 164, .3); }
+html[data-theme="hydro"] .tile-bigview { border-color: var(--ink); border-radius: 2px; font-weight: 600; }
+html[data-theme="hydro"] .roi-draft-toolbar, html[data-theme="hydro"] .roi-edit-form { border-color: var(--ink); border-radius: 2px; box-shadow: 4px 4px 0 rgba(20, 38, 61, .18); font-size: 12px; }
+html[data-theme="hydro"] .roi-edit-form .hint { font-size: 11px; }
+/* 유속 보정 표의 점 이름은 영상 위 노란 점과 같은 색이지만, 종이색 패널 위에서는 노랑이 안 읽혀 진한 황토색으로 */
+html[data-theme="hydro"] .flow-calib-form .fc-pt { color: #a16207; }
+/* roiEditor.js가 "연두색 기준선"이라는 글자를 화면 선 색(#7cffb2)으로 인라인 지정한다 — 밝은 바탕에서는 안 보이므로 진한 초록으로 */
+html[data-theme="hydro"] .roi-edit-form b[style*="7cffb2"] { color: #1f8f4c !important; }
+html[data-theme="hydro"] .zoom-box { border: 1px solid var(--ink); border-radius: 3px; }
+
+/* -- 이벤트 패널 / 알람 팝업 / 소리 활성화 -- */
+html[data-theme="hydro"] .side-panel { width: 320px; background: rgba(250, 248, 243, .95); border-left: 1px solid var(--ink); }
+html[data-theme="hydro"] .panel-header { font-size: 13px; letter-spacing: 1px; padding: 10px 12px; border-bottom: 2px solid var(--ink); }
+html[data-theme="hydro"] #eventList li { font-size: 12.5px; padding: 8px; border-bottom: 1px dashed rgba(20, 38, 61, .22); }
+html[data-theme="hydro"] #alarmToastContainer { top: 96px; width: 300px; }
+html[data-theme="hydro"] .alarm-toast { border: 1px solid var(--ink); border-left: 6px solid var(--danger); border-radius: 2px; }
+html[data-theme="hydro"] .alarm-toast .at-title { font-size: 15px; letter-spacing: .5px; }
+html[data-theme="hydro"] .alarm-toast .at-meta { font-size: 12px; }
+html[data-theme="hydro"] .alarm-toast .at-offscreen { background: var(--panel-2); border: 1px dashed var(--border); }
+html[data-theme="hydro"] .alarm-toast .at-actions button[data-act="ack"] { background: var(--danger); border-color: var(--danger); color: #fff; font-weight: 600; }
+/* 시작 덮개: 도면 표제란처럼 잉크 이중 테두리 */
+html[data-theme="hydro"] .unlock-box {
+  font-size: 15px; border: 1px solid var(--ink); border-radius: 2px;
+  box-shadow: 0 0 0 5px var(--paper), 0 0 0 6px var(--ink), var(--shadow-lg);
+}
+html[data-theme="hydro"] .unlock-box button { font-size: 15px; padding: 12px 22px; border-radius: 2px; }
+
+/* -- 설정 창: 남색 제목 띠 + 왼쪽 세로 메뉴 + 오른쪽 내용 -- */
+html[data-theme="hydro"] .modal-box {
+  display: grid; grid-template-columns: 176px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr);
+  width: 1040px; padding: 0; overflow: hidden; border: 1px solid var(--ink); border-radius: 3px; box-shadow: var(--shadow-lg);
+}
+html[data-theme="hydro"] .modal-header { grid-column: 1 / -1; padding: 10px 16px; background: var(--ink); color: var(--paper); }
+html[data-theme="hydro"] .modal-title { font-size: 14px; letter-spacing: 1px; }
+html[data-theme="hydro"] .modal-drag-hint { color: #aab6c4; }
+html[data-theme="hydro"] .modal-close { background: transparent; color: var(--paper); border-color: rgba(250, 248, 243, .4); }
+html[data-theme="hydro"] .modal-close:hover { background: var(--danger); border-color: var(--danger); }
+html[data-theme="hydro"] .modal-tabs {
+  flex-direction: column; gap: 0; padding: 8px 0; margin: 0; overflow-y: auto; overflow-x: hidden;
+  border-bottom: none; border-right: 1px solid var(--ink); background: var(--panel-2);
+}
+html[data-theme="hydro"] .modal-tabs button {
+  text-align: left; padding: 10px 14px; font-size: 13px; background: transparent; border: none; border-radius: 0; color: var(--text);
+  border-bottom: 1px dashed rgba(20, 38, 61, .15);
+}
+html[data-theme="hydro"] .modal-tabs button::before { margin-right: 8px; }
+html[data-theme="hydro"] .modal-tabs button[data-tab="tcp"]::before { content: '🔌'; }
+html[data-theme="hydro"] .modal-tabs button[data-tab="channels"]::before { content: '📷'; }
+html[data-theme="hydro"] .modal-tabs button[data-tab="alarm"]::before { content: '🔔'; }
+html[data-theme="hydro"] .modal-tabs button[data-tab="mediamtx"]::before { content: '🎞️'; }
+html[data-theme="hydro"] .modal-tabs button[data-tab="backup"]::before { content: '💾'; }
+html[data-theme="hydro"] .modal-tabs button[data-tab="theme"]::before { content: '🎨'; }
+html[data-theme="hydro"] .modal-tabs button[data-tab="help"]::before { content: '❔'; }
+html[data-theme="hydro"] .modal-tabs button:hover { background: var(--btn-hover); }
+html[data-theme="hydro"] .modal-tabs button.active { background: var(--paper); color: var(--text); font-weight: 700; box-shadow: inset 4px 0 0 var(--danger); }
+html[data-theme="hydro"] .modal-panels { padding: 16px 20px; }
+html[data-theme="hydro"] .modal-panel h3 { font-size: 16px; letter-spacing: .5px; padding-bottom: 8px; border-bottom: 2px solid var(--ink); margin-bottom: 12px; }
+html[data-theme="hydro"] .modal-panel .hint { font-size: 12px; }
+html[data-theme="hydro"] .cfg-table th, html[data-theme="hydro"] .cfg-table td { font-size: 12.5px; padding: 6px 8px; border-bottom-color: rgba(20, 38, 61, .15); }
+html[data-theme="hydro"] .cfg-table th { background: var(--panel-2); color: var(--text); border-bottom: 2px solid var(--ink); }
+html[data-theme="hydro"] .cfg-table tbody tr:hover { background: rgba(10, 126, 164, .05); }
+html[data-theme="hydro"] .save-btn { border-radius: 2px; }
+html[data-theme="hydro"] .theme-card { border-radius: 3px; }

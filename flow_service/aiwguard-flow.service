@@ -1,0 +1,23 @@
+# systemd 서비스 예시 — 서버 재부팅 후에도 유속 서비스가 자동으로 뜨게 하려면(관리자 권한 필요):
+#   sudo cp aiwguard-flow.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now aiwguard-flow
+# (이 경우 start.sh / stop.sh 대신 systemctl start|stop|status aiwguard-flow 를 쓴다.
+#  먼저 ./start.sh 를 한 번 실행해 .venv 를 만들어 두거나, run.sh 로 의존성을 설치해 둘 것)
+[Unit]
+Description=AI W-Guard surface flow (optical flow) service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=soldia-server
+WorkingDirectory=/home/soldia-server/aiwguard_flow
+ExecStart=/home/soldia-server/aiwguard_flow/.venv/bin/python -u flow_service.py flow.cfg
+Restart=always
+RestartSec=5
+# 표준 출력은 journald 로 간다. 같은 내용이 flow_service.log 에도 남는다.
+KillSignal=SIGTERM
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

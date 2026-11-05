@@ -1,0 +1,26 @@
+# AIWGuard VMS 배포용 MediaMTX 기본 설정 — 별도 편집 없이 바로 사용 가능하도록 준비된 값입니다.
+# VMS 서버(설정 > MediaMTX 탭)의 기본값(host 127.0.0.1, API 9997, WHEP 8889, HLS 8888)과 일치합니다.
+logLevel: info
+
+# REST API — VMS 서버가 채널 등록/수정/삭제 시 이 API로 path를 자동 동기화합니다.
+api: yes
+apiAddress: :9997
+
+# WebRTC(WHEP) — 브라우저 저지연 영상 재생용.
+webrtc: yes
+webrtcAddress: :8889
+
+# HLS — WebRTC 대체/폴백용.
+hls: yes
+hlsAddress: :8888
+
+# 이 MediaMTX 인스턴스는 RTSP를 직접 내보내지 않습니다(카메라 쪽 RTSP와 포트 충돌 방지).
+# 소스 RTSP는 VMS가 등록한 채널의 rtspUrl에서 "당겨오기(pull)"만 합니다.
+rtsp: no
+rtmp: no
+srt: no
+# v1.19+는 MoQ 리스너(:8892)가 기본 켜져 있어 다른 프로그램과 충돌할 수 있으므로 꺼둡니다.
+moq: no
+
+# paths는 비워두어도 됩니다 — VMS가 채널 등록/수정/삭제 시 API로 자동 추가/교체/삭제합니다.
+paths:

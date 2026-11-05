@@ -1,0 +1,33 @@
+{
+  "name": "aiwguard-vms",
+  "version": "0.5.2",
+  "description": "Jetson Orin Nano / 윈도우 추론 좌표 기반 ROI 침범 감시 VMS 웹서버",
+  "type": "module",
+  "main": "server/index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "mock:jetson": "node scripts/mockJetsonServer.js",
+    "mock:windows": "node scripts/mockWindowsClient.js",
+    "build:server": "node build/build-server.mjs",
+    "build:installer": "powershell -ExecutionPolicy Bypass -File build/build-all.ps1",
+    "clean": "powershell -ExecutionPolicy Bypass -File build/clean.ps1",
+    "rebuild": "npm run clean && npm run build:installer"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^2.0.0",
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "postject": "^1.0.0-alpha.6"
+  }
+}
+
+
+
+

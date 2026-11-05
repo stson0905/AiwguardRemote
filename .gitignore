@@ -1,0 +1,16 @@
+node_modules/
+# data/
+*.log
+.env
+mediamtx/mediamtx.yml
+mediamtx/*.log
+mediamtx/*.key
+mediamtx/*.crt
+
+# 개발자 모드 비밀번호(평문). 빌드가 이 파일을 읽어 해시만 exe에 심고 설치 패키지에는 넣지 않는다.
+# 없으면 앱/빌드가 기본 비밀번호로 자동 생성하므로 저장소에 커밋하지 않는다.
+pwd.dat
+
+# 빌드 산출물 / 벤더 바이너리 (build/vendor/mediamtx/README.md 참고 — 직접 받아서 채워야 함)
+build/out/
+build/vendor/mediamtx/mediamtx.exe

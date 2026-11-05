@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AIWGuard VMS — 침수 감시</title>
+<script>
+  // 저장된 화면 테마를 CSS가 적용되기 전에 <html data-theme>로 올린다.
+  // js/theme.js(module)는 화면이 한 번 그려진 뒤에 실행되므로, 여기서 먼저 해두지 않으면
+  // 첫 화면이 잠깐 기본 테마로 보였다가 바뀌는 깜빡임이 생긴다. 값 검증/정리는 theme.js가 한다.
+  (function () {
+    var t = null;
+    try { t = new URLSearchParams(location.search).get('theme'); } catch (e) { /* ignore */ }
+    if (!t) { try { t = localStorage.getItem('aiwguard.theme'); } catch (e) { /* ignore */ } }
+    if (t === 'daylight') t = 'hydro'; // 없어진 테마 id (theme.js ALIASES와 같게 유지)
+    if (t) document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<link rel="stylesheet" href="/css/style.css" />
+<!-- 파비콘이 없으면 브라우저가 열 때마다 /favicon.ico를 요청해 404가 남는다 — 빈 아이콘으로 요청 자체를 막는다 -->
+<link rel="icon" href="data:," />
+</head>
+<body>
+<div id="app">
+
+  <!-- 감시 상태 띠: 전체 정상/경보 상태 + 채널·화면 요약 + 시계. 모든 테마 공통(테마마다 색만 다름, css/style.css "감시 상태 띠").
+       내용은 app.js renderWatchStatus()가 그린다. 경보 중이면 "경보 화면 보기"로 그 채널이 있는 화면으로 간다. -->
+  <div class="watch-status" id="watchStatus" role="status" aria-live="polite"></div>
+
+  <header id="topbar">
+    <div class="brand">🌊 AIWGuard <span>VMS</span></div>
+
+    <!-- .lg-ico(분할 모양 아이콘)와 .xl-only(라벨)는 하이드로 차트 테마처럼 "아이콘+이름" 리본형 버튼을 쓰는 테마에서만 보인다.
+         클래식/딥 오션에서는 숫자만 보인다. 클릭 처리는 closest('button[data-layout]')이라 안쪽 요소를 눌러도 된다. -->
+    <div class="layout-switch" id="layoutSwitch">
+      <button data-layout="1" title="1분할"><i class="lg-ico xl-only"></i><span class="lg-txt">1<span class="xl-only">분할</span></span></button>
+      <button data-layout="4" title="4분할"><i class="lg-ico xl-only"></i><span class="lg-txt">4<span class="xl-only">분할</span></span></button>
+      <button data-layout="8" title="8분할 (큰 화면 1 + 작은 화면 7)"><i class="lg-ico xl-only"></i><span class="lg-txt">8<span class="xl-only">분할</span></span></button>
+      <button data-layout="16" class="active" title="16분할"><i class="lg-ico xl-only"></i><span class="lg-txt">16<span class="xl-only">분할</span></span></button>
+      <!-- 36분할은 v0.4.3부터 숨김(사용자 요청 — 지원 상한 16분할). 코드는 남아 있다: app.js HIDDEN_LAYOUTS 참고 -->
+      <button data-layout="36" title="36분할 (6x6)" hidden><i class="lg-ico xl-only"></i><span class="lg-txt">36<span class="xl-only">분할</span></span></button>
+      <button data-layout="custom" title="사용자분할 — 왼쪽 목록에서 고른 채널만 8분할 모양으로 표시 (8개를 넘으면 화면 페이지가 늘어남)"><i class="lg-ico xl-only"></i><span class="lg-txt">사용자<span class="xl-only">분할</span></span></button>
+    </div>
+
+    <div class="page-tabs" id="pageTabs"></div>
+
+    <div class="topbar-spacer"></div>
+
+    <div class="status-lights" id="statusLights"></div>
+
+    <!-- 아이콘과 이름을 따로 감싼 것은 리본형 테마에서 아이콘 위/이름 아래로 쌓기 위함. 전체화면 이름은 리본형 테마에서만 보인다. -->
+    <div class="toolbar-actions">
+      <button id="btnEventLog" class="tb-btn"><i class="ico">📋</i> <span class="lbl">이벤트 로그</span></button>
+      <button id="btnSettings" class="tb-btn"><i class="ico">⚙</i> <span class="lbl">설정</span></button>
+      <button id="btnFullscreen" class="tb-btn" title="전체화면"><i class="ico">⛶</i> <span class="lbl xl-only">전체화면</span></button>
+    </div>
+  </header>
+
+  <div id="body">
+    <aside id="sidebar">
+      <input id="channelSearch" placeholder="채널 검색..." />
+      <div class="sidebar-hint" id="sidebarHint">채널을 끌어서 화면 칸에 놓으면 그 자리로 옮겨집니다(있던 채널과 자리 바꿈). 채널 클릭 후 칸을 클릭해도 됩니다.</div>
+      <ul id="channelList"></ul>
+      <button id="btnAddChannelQuick" class="side-add-btn">+ 채널 추가</button>
+    </aside>
+
+    <main id="gridWrap">
+      <div id="grid" class="grid grid-16"></div>
+
+      <!-- 채널 더블클릭 시 화면 정중앙에 뜨는 확대 보기.
+           새 영상을 다시 연결하지 않고 타일 자체를 여기로 옮겨 담기 때문에
+           재생 중인 영상과 ROI 오버레이/편집 기능이 그대로 따라온다. -->
+      <div id="zoomOverlay" class="zoom-overlay hidden">
+        <div class="zoom-box" id="zoomBox"></div>
+      </div>
+    </main>
+
+    <aside id="eventPanel" class="side-panel hidden">
+      <div class="panel-header">
+        <span>이벤트 로그</span>
+        <div>
+          <a id="btnExportCsv" href="/api/events/export.csv" class="tb-btn small">CSV</a>
+          <button id="btnCloseEventPanel" class="tb-btn small">×</button>
+        </div>
+      </div>
+      <ul id="eventList"></ul>
+    </aside>
+  </div>
+
+  <div id="unlockOverlay">
+    <div class="unlock-box">
+      <p>🔔 브라우저 정책상 소리는 사용자 조작 후에만 재생할 수 있습니다.</p>
+      <button id="btnUnlock">🔊 모니터링 시작 (소리 활성화)</button>
+    </div>
+  </div>
+
+  <div id="alarmToastContainer"></div>
+
+  <div id="settingsModal" class="modal hidden">
+    <div class="modal-box" id="settingsModalBox">
+      <div class="modal-header" id="settingsModalHeader">
+        <span class="modal-title">⚙ 설정</span>
+        <span class="modal-drag-hint tip">제목 표시줄을 끌어 창을 옮길 수 있습니다 (더블클릭 = 가운데로)</span>
+        <button id="btnCloseSettings" class="modal-close">×</button>
+      </div>
+      <div class="modal-tabs" id="modalTabs">
+        <button data-tab="tcp" class="active">TCP 연결</button>
+        <button data-tab="channels">채널 / RTSP</button>
+        <button data-tab="alarm">알람 설정</button>
+        <button data-tab="mediamtx">MediaMTX</button>
+        <button data-tab="backup">백업</button>
+        <button data-tab="theme">화면 테마</button>
+        <button data-tab="help">Help</button>
+      </div>
+      <div class="modal-panels">
+        <section data-panel="tcp" class="modal-panel active">
+          <h3>추론 좌표 TCP 소스 (Jetson Orin Nano / 윈도우 추론 PC)</h3>
+          <p class="hint tip">
+            <b>접속 (VMS→소스)</b>: 소스가 TCP 서버인 경우. 그 IP:Port로 본 서버가 접속합니다(Jetson 기본, 예 192.168.30.110:7070).<br />
+            <b>수신 대기 (소스→VMS)</b>: 소스가 TCP 클라이언트인 경우. 본 서버가 그 Port를 열고 기다립니다(윈도우 추론 프로그램용, 기본 7100).
+            IP는 바인딩할 주소로 <code>0.0.0.0</code>이면 모든 네트워크 카드에서 수신합니다. 한 포트에 여러 대가 동시에 접속해도 됩니다.<br />
+            메시지 포맷(NDJSON)은 두 경우 모두 동일합니다 — docs/PROTOCOL.md 참고.<br />
+            <b>유속 서비스</b>(추론 서버의 별도 프로그램, 기본 7200)는 "접속"으로 추가하고 <b>번호 기준</b>을 AI W-Guard 소스로
+            지정하세요. 유속 서비스는 AI W-Guard와 같은 채널 번호를 보내므로, 그러면 같은 채널에 유속이 표시됩니다.
+          </p>
+          <table class="cfg-table" id="tcpTable">
+            <thead><tr><th>상태</th><th>라벨</th><th>모드</th><th>IP / 바인딩</th><th>Port</th><th>번호 기준</th><th>자동재접속</th><th>사용</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </section>
+
+        <section data-panel="channels" class="modal-panel">
+          <h3>채널 / RTSP 관리 (최대 128채널)</h3>
+          <p class="hint tip">"cam ID"는 추론 소스(Jetson 보드 / 윈도우 프로그램)가 좌표 메시지에 실어 보내는 <code>cam</code> 번호와
+            일치해야 ROI 침범률이 계산됩니다. "소스"를 지정하면 그 소스에서 온 좌표만 이 채널로 받습니다 —
+            여러 소스가 같은 cam 번호를 쓸 때(예: Jetson도 1번, 윈도우도 1번) 구분하는 용도이며, 비워두면 모든 소스를 받습니다.</p>
+
+          <div id="camRecvStatus" class="recv-box">
+            <div class="recv-title">실시간 수신 현황 <span class="hint tip">— 소스가 지금 보내고 있는 cam 번호입니다. 아래 표의 "cam ID"를 이 번호에 맞춰야 좌표가 채널로 들어옵니다.</span></div>
+            <div class="recv-body"><span class="hint">확인 중...</span></div>
+          </div>
+
+          <div class="table-toolbar">
+            <span class="tb-count" id="chCount"></span>
+            <span class="tb-spacer"></span>
+            <button id="btnBulkAddToggle" title="RTSP 주소 목록을 붙여넣어 여러 채널을 한 번에 등록합니다">＋ 여러 채널 한 번에 추가</button>
+            <button id="btnBulkEnable" disabled>선택 사용</button>
+            <button id="btnBulkDisable" disabled>선택 해제</button>
+            <button id="btnBulkDelete" class="danger-btn" disabled>선택 삭제</button>
+          </div>
+
+          <div id="bulkAddBox" class="bulk-box hidden">
+            <div class="bulk-title">여러 채널 한 번에 추가</div>
+            <p class="hint">한 줄에 채널 하나씩. <b>제목, RTSP주소, cam ID</b> 순서이며 RTSP 주소만 적어도 됩니다(나머지는 자동).<br />
+              예) <code>하천1, rtsp://admin:admin@192.168.30.74:8554/cam1, 1</code> &nbsp;/&nbsp; <code>rtsp://192.168.30.74:8554/cam2</code></p>
+            <textarea id="bulkAddText" rows="6" spellcheck="false"
+              placeholder="rtsp://admin:admin@192.168.30.74:8554/cam1&#10;rtsp://admin:admin@192.168.30.74:8554/cam2"></textarea>
+            <div class="bulk-opts">
+              <label>자동 제목 <input type="text" id="bulkTitlePrefix" value="채널" style="width:70px" /></label>
+              <label>소스 <span id="bulkSourceWrap"></span></label>
+              <label><input type="checkbox" id="bulkAutoCam" checked /> cam ID 자동 채번</label>
+              <label>시작 번호 <input type="number" id="bulkCamStart" value="1" min="0" style="width:56px" /></label>
+            </div>
+            <div id="bulkAddPreview" class="bulk-preview hint"></div>
+            <div class="row">
+              <button id="btnBulkAddSubmit" class="save-btn" disabled>추가</button>
+              <button id="btnBulkAddCancel">닫기</button>
+            </div>
+          </div>
+
+          <table class="cfg-table" id="channelTable">
+            <thead><tr><th class="col-sel"><input type="checkbox" id="chSelectAll" title="전체 선택 / 해제" /></th><th>사용</th><th>제목</th><th>channel_id</th><th>cam ID</th><th>소스</th><th>RTSP 주소</th><th>미디어</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <p class="hint tip">행 왼쪽 네모로 여러 채널을 고른 뒤 위의 "선택 삭제"로 한꺼번에 지울 수 있습니다.
+            Shift를 누른 채 고르면 그 사이 범위가 모두 선택됩니다. 표 맨 아래 줄에서 채널을 하나씩 추가할 수 있고, Enter로도 추가됩니다.</p>
+          <div class="danger-zone">
+            <button id="btnClearAllRois" class="danger-btn">⚠ 전체 채널 ROI 모두 삭제</button>
+            <button id="btnDeleteAllChannels" class="danger-btn">⚠ 전체 채널 삭제</button>
+          </div>
+        </section>
+
+        <section data-panel="alarm" class="modal-panel">
+          <h3>알람 설정</h3>
+          <label class="row"><input type="checkbox" id="cfgSirenEnabled" /> 사이렌 사운드 사용</label>
+          <label class="row"><input type="checkbox" id="cfgTtsEnabled" /> 음성 안내(TTS) 사용</label>
+          <label class="row">볼륨 <input type="range" id="cfgVolume" min="0" max="1" step="0.05" /></label>
+          <label class="row">사운드 반복 간격(초, 확인 전까지) <input type="number" id="cfgRepeatInterval" min="1" max="300" /></label>
+          <label class="row">쿨다운(초) <input type="number" id="cfgCooldown" min="0" max="600" /></label>
+          <label class="row">히스테리시스(%p, 침범률 ROI) <input type="number" id="cfgHysteresis" min="0" max="50" /></label>
+          <label class="row">히스테리시스(m, 물높이 ROI) <input type="number" id="cfgHysteresisM" min="0" max="10" step="0.01" /></label>
+          <label class="row">히스테리시스(m/s, 유속 ROI) <input type="number" id="cfgHysteresisMps" min="0" max="10" step="0.05" /></label>
+          <p class="hint tip">알람이 한 번 울린 뒤에는 측정값이 임계값보다 이만큼 더 내려가야 해제됩니다.
+            임계값 근처에서 값이 오르내릴 때 알람이 깜빡이는 것을 막습니다. ROI의 판정 기준에 따라
+            침범률(%), 물높이(m), 유속(m/s) 중 해당하는 값이 적용됩니다.</p>
+          <label class="row">물높이 평활화(초) <input type="number" id="cfgLevelSmoothSec" min="0" max="300" /></label>
+          <p class="hint tip">물높이(m) 기준 ROI의 판독값을 최근 이 시간 동안의 중앙값으로 부드럽게 만듭니다.
+            실제 하천은 파도 때문에 수면선이 초 단위로 출렁이므로(실측 예: 30초에 ±0.2m) 값을 너무 작게 잡으면
+            알람이 깜빡이고, 너무 크게 잡으면 수위 상승 감지가 그만큼 늦어집니다. 0이면 평활화하지 않습니다.</p>
+          <label class="row">유속 평활화(초) <input type="number" id="cfgFlowSmoothSec" min="0" max="300" /></label>
+          <p class="hint tip">유속(m/s) 기준 ROI의 판독값을 최근 이 시간 동안의 중앙값으로 부드럽게 만듭니다. 유속 서비스가 이미 3초
+            중앙값을 보내므로 기본 10초면 물보라로 인한 순간 튐은 충분히 걸러집니다. 0이면 평활화하지 않습니다.</p>
+          <label class="row">기본 알람 라벨 <input type="text" id="cfgDefaultLabel" /></label>
+          <label class="row">반복 경고 팝업 주기(분) <input type="number" id="cfgRepeatPopupMinutes" min="0" max="1440" /></label>
+          <p class="hint tip">확인(Ack) 버튼을 눌러 팝업을 닫아도, 이 채널의 침수가 계속 감지되는 동안에는 위 주기(분)마다
+            경고 팝업이 다시 뜹니다. 0으로 설정하면 재알림을 하지 않습니다.</p>
+
+          <h3 style="margin-top:18px">탐지 오버레이 표시</h3>
+          <p class="hint tip">ROI 침범률(%) 계산은 항상 보드가 보낸 원본(water/road) 폴리곤을 그대로 사용합니다(정확도 우선, 변경 불가).
+            아래 옵션은 그 탐지 영역을 화면에 그림으로 그려서 보여줄지 여부만 결정하며, 계산 결과에는 영향을 주지 않습니다.</p>
+          <label class="row"><input type="checkbox" id="cfgShowDetectionOverlay" /> 탐지된 물/도로 영역을 화면에 표시 (기본값: 표시 안 함)</label>
+
+          <h3 style="margin-top:18px">유속 표시</h3>
+          <p class="hint tip">유속 서비스가 연결된 채널은 ROI마다 화면상 유속(px/s)과 방향을 표시합니다. 아래 옵션을 켜면 믿을 수 있는
+            격자 칸마다 "1초 동안 수면이 움직이는 거리"만큼의 화살표도 그립니다. 비스듬한 카메라는 같은 물살이어도 화면 위쪽(먼 곳)이
+            느리게 보이므로, 실제 m/s가 아니라 같은 ROI의 변화 추이를 보는 값입니다.</p>
+          <label class="row"><input type="checkbox" id="cfgShowFlowVectors" /> 유속 화살표를 화면에 표시 (기본값: 표시)</label>
+          <div class="row">
+            커스텀 알람음(mp3/wav): <input type="file" id="cfgAudioFile" accept="audio/*" />
+            <span id="cfgAudioCurrent"></span>
+            <button id="btnRemoveAudio" class="danger-btn small">제거</button>
+          </div>
+          <button id="btnTestAlarm" class="add-row-btn">🔔 테스트 알람 재생</button>
+          <button id="btnSaveAlarm" class="save-btn">저장</button>
+        </section>
+
+        <section data-panel="mediamtx" class="modal-panel">
+          <h3>MediaMTX 연동</h3>
+          <p class="hint tip">RTSP → WebRTC(WHEP) 변환용 MediaMTX를 별도 프로세스로 실행한 뒤 접속 정보를 입력하세요. (docs/README 참고)</p>
+          <label class="row">Host <input type="text" id="mtxHost" /></label>
+          <label class="row">API Port <input type="number" id="mtxApiPort" /></label>
+          <label class="row">WHEP(WebRTC) Port <input type="number" id="mtxWhepPort" /></label>
+          <label class="row">HLS Port <input type="number" id="mtxHlsPort" /></label>
+          <button id="btnSaveMediamtx" class="save-btn">저장 및 채널 동기화</button>
+        </section>
+
+        <section data-panel="theme" class="modal-panel">
+          <h3>화면 테마</h3>
+          <p class="hint">메인 화면·설정 창·알람 팝업의 색상과 배치를 정하는 테마를 고릅니다. 카드를 클릭하면 바로 바뀝니다.
+            고른 테마는 <b>이 브라우저에만</b> 저장되어 다른 운영자 화면에는 영향을 주지 않습니다.</p>
+          <!-- 카드는 settingsPanel.js가 js/theme.js의 THEMES 목록으로 그린다 (테마 추가 시 그 목록만 고치면 된다) -->
+          <div class="theme-cards" id="themeCards" role="radiogroup" aria-label="화면 테마"></div>
+          <p class="hint tip">대형 모니터처럼 항상 같은 테마로 띄우려면 주소에 <code>?theme=ocean</code> 또는 <code>?theme=classic</code>을
+            붙여 열면 됩니다 — 그 테마로 시작하고 브라우저에 기억됩니다.</p>
+        </section>
+
+        <!-- 설정 백업. 평소에는 제목 + 한 줄 설명 + 내보내기 버튼만 보이고, 나머지(상세 내용·요약·주의·복원 방법)는
+             개발자 모드에서만 보인다(.tip — 사용자 요청 v0.5.2). 저장 위치/개수는 settingsPanel.js renderBackupInfo()가 채운다. -->
+        <section data-panel="backup" class="modal-panel">
+          <h3>설정 백업</h3>
+          <p class="hint">채널·ROI·알람 등 프로그램의 모든 설정을 파일 하나로 내보냅니다.</p>
+          <div class="backup-export">
+            <a id="btnExportConfig" class="save-btn btn-link" href="/api/config/export" download>💾 설정 파일 내보내기</a>
+            <span id="backupSummary" class="hint tip"></span>
+          </div>
+
+          <div class="tip">
+          <p class="hint">들어가는 내용: 채널·RTSP 주소, ROI(침범률/물높이/유속), 유속 보정값, TCP 연결, 알람 설정, 화면 분할·채널 순서,
+            MediaMTX 설정(JSON 파일 하나). 이벤트 기록(events.log)은 들어가지 않습니다.</p>
+          <div id="backupAudioWarn" class="recv-warn" hidden>🔔 사용자 경보음(mp3)을 쓰고 있습니다. 경보음 파일은 설정 파일에 들어가지 않으므로
+            아래 저장 위치의 <code>alarms</code> 폴더도 함께 복사해 두세요.</div>
+          <div class="recv-warn">⚠ 백업 파일에는 카메라 RTSP 주소(아이디/비밀번호 포함)가 그대로 들어 있습니다. 안전한 곳에 보관하세요.</div>
+
+          <h3 class="backup-h">복원 방법 (새 PC 또는 재설치 후)</h3>
+          <ol class="backup-steps">
+            <li>새 PC에 AIWGuard VMS를 설치합니다.</li>
+            <li><b>VMS를 먼저 종료합니다</b>(서버·MediaMTX 콘솔 창 닫기). 켜 둔 채로 복사하면 프로그램이 기억하고 있던 설정으로 다시 덮어써집니다.</li>
+            <li>백업 파일의 이름을 <code>config.json</code>으로 바꿔 아래 폴더에 복사합니다(기존 파일 덮어쓰기).
+              <div class="backup-path"><code id="backupDataDir">C:\ProgramData\AIWGuardVMS</code>
+                <button id="btnCopyDataDir" class="small-btn" title="경로 복사">복사</button></div>
+              <span class="hint">ProgramData는 숨김 폴더라 탐색기에서 안 보일 수 있습니다 — 탐색기 주소창에 위 경로를 그대로 붙여 넣으세요.</span></li>
+            <li>사용자 경보음을 쓰던 경우 <code>alarms</code> 폴더도 같은 위치에 복사합니다.</li>
+            <li>VMS를 다시 실행합니다. 이전 버전에서 만든 백업이면 시작할 때 자동으로 새 형식으로 바뀝니다.</li>
+          </ol>
+          <p class="hint">복사한 파일이 깨져 있어 읽지 못하면 프로그램은 기본 설정으로 시작하고, 그 파일은 지우지 않고
+            같은 폴더에 <code>config.broken-날짜.json</code>으로 보관합니다.</p>
+          </div>
+        </section>
+
+        <section data-panel="help" class="modal-panel">
+          <h3>프로그램 정보</h3>
+          <div class="help-table">
+            <div class="help-row"><span class="help-key">이름</span><span id="helpAppName">AIWGuard VMS</span></div>
+            <div class="help-row"><span class="help-key">버전</span><span id="helpVersion" class="version-value">확인 중...</span></div>
+          </div>
+
+          <!-- 버전을 5번 클릭하면 나타나는 개발자 모드 잠금 해제 상자 -->
+          <div id="devUnlockBox" class="dev-box hidden">
+            <div class="dev-box-title">🔒 개발자 모드</div>
+            <div class="row">
+              <input type="password" id="devPassword" placeholder="비밀번호" autocomplete="off" style="width:180px" />
+              <button id="btnDevUnlock">확인</button>
+              <button id="btnDevCancel">취소</button>
+            </div>
+            <div id="devUnlockMsg" class="dev-msg"></div>
+          </div>
+
+          <!-- 개발자 모드가 켜져 있을 때만 보이는 상태 표시 -->
+          <div id="devOnBox" class="dev-box dev-box-on hidden">
+            <div class="dev-box-title">🔓 개발자 모드 사용 중</div>
+            <div class="dev-msg">설정 화면 각 항목의 자세한 설명이 표시됩니다. 이 브라우저에만 적용됩니다.</div>
+            <button id="btnDevLock" class="danger-btn">개발자 모드 끄기</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>

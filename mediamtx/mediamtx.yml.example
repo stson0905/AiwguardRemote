@@ -1,0 +1,30 @@
+# MediaMTX 설정 예시 — https://github.com/bluenviron/mediamtx 릴리스에서 OS에 맞는 바이너리를 받아
+# 이 파일을 mediamtx.yml 로 복사한 뒤 `mediamtx.exe mediamtx.yml` (Windows) 로 실행하세요.
+# VMS 서버는 아래 API를 통해 채널의 RTSP 소스를 paths 로 자동 동기화합니다.
+
+# REST API 활성화 (VMS 서버가 채널 CRUD 시 이 API를 호출해 path를 추가/삭제합니다)
+api: yes
+apiAddress: :9997
+
+# WebRTC(WHEP) 출력 — 브라우저 저지연 재생용 (VMS 기본 설정과 포트 일치 필요)
+webrtc: yes
+webrtcAddress: :8889
+
+# HLS 출력 (WebRTC 대체/폴백용, 선택)
+hls: yes
+hlsAddress: :8888
+
+# RTSP 서버 자체 기능은 VMS에서 직접 사용하지 않지만 기본값 유지 가능
+rtsp: yes
+rtspAddress: :8554
+
+# MediaMTX v1.19+는 MoQ 리스너가 기본 활성화되어 포트 충돌이 날 수 있으므로 필요 없다면 꺼둔다.
+moq: no
+
+# paths는 비워두어도 됩니다 — VMS가 채널 등록/수정/삭제 시 API로 자동 추가/교체/삭제합니다.
+# 수동으로 미리 등록하고 싶다면 예시:
+# paths:
+#   ch1:
+#     source: rtsp://192.168.0.50:554/stream1
+#     sourceOnDemand: yes
+paths:

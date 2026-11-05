@@ -1,0 +1,266 @@
+{
+  "channels": [
+    {
+      "id": "ch_mtb1dk9379318f",
+      "channelId": "1-yhbz",
+      "title": "하천1",
+      "rtspUrl": "rtsp://admin:admin@192.168.30.74:8554/cam1",
+      "enabled": true,
+      "mediaStatus": "unknown",
+      "camId": "1",
+      "sourceId": null,
+      "flowCalib": null
+    },
+    {
+      "id": "ch_mtb1dtz68c42ac",
+      "channelId": "2-li6k",
+      "title": "하천2",
+      "rtspUrl": "rtsp://admin:admin@192.168.30.74:8554/cam2",
+      "enabled": true,
+      "mediaStatus": "unknown",
+      "camId": "2",
+      "sourceId": null,
+      "flowCalib": null
+    },
+    {
+      "id": "ch_mtb1e1ra5e23aa",
+      "channelId": "3-gcuf",
+      "title": "하천3",
+      "rtspUrl": "rtsp://admin:admin@192.168.30.74:8554/cam3",
+      "enabled": true,
+      "mediaStatus": "unknown",
+      "camId": "3",
+      "sourceId": null,
+      "flowCalib": null
+    },
+    {
+      "id": "ch_mtb1ec142a481b",
+      "channelId": "4-nytl",
+      "title": "하천4",
+      "rtspUrl": "rtsp://admin:admin@192.168.30.74:8554/cam4",
+      "enabled": true,
+      "mediaStatus": "unknown",
+      "camId": "4",
+      "sourceId": null,
+      "flowCalib": null
+    }
+  ],
+  "rois": [
+    {
+      "id": "roi_mtb3mgtv8aae1b",
+      "channelId": "4-nytl",
+      "name": "ROI-1",
+      "points": [
+        [
+          0.8428262436914203,
+          0.6760259179265659
+        ],
+        [
+          0.7116077865897621,
+          0.7105831533477321
+        ],
+        [
+          0.7101658255227109,
+          0.7105831533477321
+        ],
+        [
+          0.7620764239365537,
+          0.7840172786177105
+        ],
+        [
+          0.9322278298485941,
+          0.7321814254859611
+        ]
+      ],
+      "threshold": 30,
+      "label": "침수발생",
+      "classFilter": null,
+      "color": "#4ade80",
+      "thresholdMode": "percent",
+      "heightScale": {
+        "topM": null,
+        "bottomM": null,
+        "topY": null,
+        "bottomY": null
+      },
+      "thresholdM": null,
+      "thresholdMps": null
+    },
+    {
+      "id": "roi_mtb43k9cd58d62",
+      "channelId": "1-yhbz",
+      "name": "ROI-1",
+      "points": [
+        [
+          0.547945205479452,
+          0.21814254859611232
+        ],
+        [
+          0.5681326604181687,
+          0.5874730021598272
+        ],
+        [
+          0.6906993511175198,
+          0.5809935205183585
+        ],
+        [
+          0.6661860129776496,
+          0.23758099352051837
+        ]
+      ],
+      "threshold": 70,
+      "label": "침수발생",
+      "classFilter": null,
+      "color": "#4ade80",
+      "thresholdMode": "percent",
+      "heightScale": {
+        "topM": null,
+        "bottomM": null,
+        "topY": null,
+        "bottomY": null
+      },
+      "thresholdM": null,
+      "thresholdMps": null
+    },
+    {
+      "id": "roi_mtb441z3a296da",
+      "channelId": "2-li6k",
+      "name": "ROI-1",
+      "points": [
+        [
+          0.8269646719538573,
+          0.6781857451403888
+        ],
+        [
+          0.7116077865897621,
+          0.7041036717062635
+        ],
+        [
+          0.756308579668349,
+          0.7624190064794817
+        ],
+        [
+          0.8759913482335977,
+          0.7213822894168467
+        ]
+      ],
+      "threshold": 50,
+      "label": "침수발생",
+      "classFilter": null,
+      "color": "#4ade80",
+      "thresholdMode": "percent",
+      "heightScale": {
+        "topM": null,
+        "bottomM": null,
+        "topY": null,
+        "bottomY": null
+      },
+      "thresholdM": null,
+      "thresholdMps": null
+    },
+    {
+      "id": "roi_mtb5fmn0c1f261",
+      "channelId": "3-gcuf",
+      "name": "ROI-1",
+      "points": [
+        [
+          0.768565248738284,
+          0.21814254859611232
+        ],
+        [
+          0.6964671953857245,
+          0.3326133909287257
+        ],
+        [
+          0.8507570295602018,
+          0.3542116630669546
+        ],
+        [
+          0.8493150684931506,
+          0.3542116630669546
+        ],
+        [
+          0.8968997837058399,
+          0.19438444924406048
+        ]
+      ],
+      "threshold": 50,
+      "label": "침수발생",
+      "classFilter": null,
+      "color": "#4ade80",
+      "thresholdMode": "percent",
+      "heightScale": {
+        "topM": null,
+        "bottomM": null,
+        "topY": null,
+        "bottomY": null
+      },
+      "thresholdM": null,
+      "thresholdMps": null
+    }
+  ],
+  "tcpConnections": [
+    {
+      "id": "tcp_default",
+      "ip": "192.168.30.110",
+      "port": 7070,
+      "label": "Jetson Orin Nano #1",
+      "enabled": true,
+      "autoReconnect": true,
+      "mode": "client",
+      "pairedSourceId": null
+    },
+    {
+      "id": "tcp_inbound_default",
+      "mode": "server",
+      "ip": "0.0.0.0",
+      "port": 7100,
+      "label": "윈도우 추론 수신 대기",
+      "enabled": true,
+      "autoReconnect": true,
+      "pairedSourceId": null
+    }
+  ],
+  "alarmSettings": {
+    "sirenEnabled": true,
+    "ttsEnabled": true,
+    "volume": 0.8,
+    "cooldownSec": 10,
+    "hysteresisPct": 5,
+    "hysteresisM": 0.1,
+    "levelSmoothSec": 10,
+    "hysteresisMps": 0.1,
+    "flowSmoothSec": 10,
+    "repeatIntervalSec": 30,
+    "repeatPopupMinutes": 1,
+    "defaultLabel": "침수발생",
+    "customAudioAssetId": null
+  },
+  "mediamtx": {
+    "host": "127.0.0.1",
+    "apiPort": 9997,
+    "whepPort": 8889,
+    "hlsPort": 8888
+  },
+  "detectionSettings": {
+    "showOverlay": false,
+    "shape": "bbox"
+  },
+  "schemaVersion": 3,
+  "display": {
+    "layout": 4,
+    "order": [
+      "1-yhbz",
+      "2-li6k",
+      "3-gcuf",
+      "4-nytl"
+    ],
+    "custom": false,
+    "customOrder": []
+  },
+  "flowSettings": {
+    "showVectors": true,
+    "fbMin": 0.8,
+    "rMin": 0.7
+  }
+}
